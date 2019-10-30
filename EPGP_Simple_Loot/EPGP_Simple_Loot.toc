@@ -2,7 +2,7 @@
 ## Title: EPGP SimpleLoot
 ## Notes: A simplified loot distribution system for EPGP.
 ## Author: Waterwraith-Zul'Jin
-## Version: 1.11
+## Version: 1.12
 ## SavedVariables: SimpleLootDB
 ## OptionalDeps: epgp
 

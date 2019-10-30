@@ -1,6 +1,6 @@
-
 SimpleLoot = LibStub("AceAddon-3.0"):NewAddon("SimpleLoot", "AceEvent-3.0", "AceHook-3.0", "AceConsole-3.0", "AceComm-3.0", "AceTimer-3.0", "AceSerializer-3.0")
-local VERSION = "1.11"
+local SimpleLoot = SimpleLoot
+local VERSION = GetAddOnMetadata('EPGP_SIMPLE_LOOT', 'Version')
 local ProtocolVersion = 110
 local ScrollingTable = LibStub("ScrollingTable")
 local GP = LibStub("LibGearPoints-1.0")
