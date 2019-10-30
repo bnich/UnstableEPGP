@@ -30,12 +30,17 @@ end
 local callbacks = mod.callbacks
 
 local timestamp_t = {}
+
 local function GetTimestamp(diff)
-  timestamp_t.month =1
-  timestamp_t.day = 1
-  timestamp_t.year = 1
+
+  local tbl = date("*t", t);
+  
+  timestamp_t.month = tbl.month
+  timestamp_t.day = tbl.day
+  timestamp_t.year = tbl.year
   timestamp_t.hour = select(1, GetGameTime())
   timestamp_t.min = select(2, GetGameTime())
+  
   if diff then
     timestamp_t.month = timestamp_t.month + (diff.month or 0)
     timestamp_t.day = timestamp_t.day + (diff.day or 0)
@@ -214,7 +219,7 @@ end
 
 function mod:Export()
   local d = {}
-  d.region = GetRegion()
+  d.region = "us"
   d.guild = select(1, GetGuildInfo("player"))
   d.realm = GetRealmName()
   d.base_gp = EPGP:GetBaseGP()
