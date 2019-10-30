@@ -1,0 +1,13 @@
+------------------------------------------------------------------------
+r184 | nevcairiel | 2014-12-22 09:22:55 +0000 (Mon, 22 Dec 2014) | 1 line
+Changed paths:
+   A /tags/6.0-release11 (from /trunk:183)
+
+Weekly Tag - #11
+------------------------------------------------------------------------
+r183 | nevcairiel | 2014-12-22 09:22:12 +0000 (Mon, 22 Dec 2014) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Inventory-3.0.lua
+
+Automated LibBabble re-generation from the localization system
+------------------------------------------------------------------------

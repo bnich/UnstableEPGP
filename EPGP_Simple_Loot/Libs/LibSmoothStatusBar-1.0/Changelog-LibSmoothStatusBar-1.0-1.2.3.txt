@@ -1,0 +1,12 @@
+tag 1.2.3
+07193a1944d0ae91c27c0d69e4d669757a5ef579
+galedric <g@ledric.me>
+2014-10-15 20:46:11 +0200
+
+Tagging as 1.2.3
+
+
+--------------------
+
+galedric:
+	- Bump for 6.0

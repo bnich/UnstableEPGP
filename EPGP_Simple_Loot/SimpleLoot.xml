@@ -1,0 +1,47 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="SimpleLoot.lua"/>
+	<Frame name="HelloWorldFrame" toplevel="false" movable="true" parent="UIParent" enableMouse="true" inherits="ButtonFrameTemplate" hidden="True">
+		<Scripts>
+			<OnLoad>
+			</OnLoad>
+		</Scripts>
+		<Size x="838" y="424"/>
+		<Anchors>
+			<Anchor point="CENTER"/>				
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY" textureSubLevel="-1">
+				<Texture name="MacroFramePortrait" file="Interface\MacroFrame\MacroFrame-Icon">
+					<Size x="60" y="60"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-5" y="5"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER">
+				<FontString inherits="GameFontNormal" text="EPGP Simple Loot">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="HelloWorldFrame" x="0" y="-5"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="TestBar" file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size x="256" y="16"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-210"/>
+					</Anchors>
+					<TexCoords left="0" right="1.0" top="0" bottom="0.25"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-HorizontalBar">
+					<Size x="75" y="16"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="TestBar" relativePoint="RIGHT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords left="0" right="0.29296875" top="0.25" bottom="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+</Ui>
