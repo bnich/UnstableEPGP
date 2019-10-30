@@ -64,6 +64,7 @@ function SimpleLoot:OnInitialize()
 
 			tabbedFrame			= "yes",
 			announceButton		= 2,
+			lootThreshold		= 4,
 			announceConfirm		= false,
 			allowReselect		= true,
 			autoAdvance			= true,
@@ -1075,9 +1076,12 @@ function SimpleLoot:GetLootIDFromLink(itemLink)
     return lootID
 end
 
+function SimpleLoot:GetLootThreshold()
+    return EPGP.db.profile.lootThreshold
+end
+
 function SimpleLoot:OPEN_MASTER_LOOT_LIST(announce)
 buttonName = GetMouseButtonClicked()
-
 	if self.db.profile.useSimpleLoot and self.currentML then
 		-- Close default Blizzard popup unless RIGHT ALT key is pressed
 		if not IsRightAltKeyDown() then
@@ -1092,7 +1096,7 @@ buttonName = GetMouseButtonClicked()
 				self:LOOT_OPENED()
 				--self.autoAnnounce = nil
 			end
-			
+
 			-- Should we automatically announce ALL items?
 			if self.autoAnnounce == "" or self.autoAnnounce == nil then
 				-- Find the number of items that match the loot threshold
@@ -1130,22 +1134,27 @@ buttonName = GetMouseButtonClicked()
 				end
 			elseif self.autoAnnounce == true then
 				self.autoAnnounce = false
-				local itemNum = 0
-				for lootID, lootInfo in pairs(self.lootCache) do
-					if self.lootCache[lootID] and lootInfo.quantity > 0 then
-						for x = 1, lootInfo.quantity do
-							-- Announce loot to candidates
-							self:ScheduleTimer("NewLoot", .6*(itemNum), lootInfo.link, lootInfo.slot, "drop")
-							lootInfo.quantity = lootInfo.quantity - 1
-							itemNum = itemNum + 1
-						end
-					elseif self.lootCache[lootID] and lootInfo.duplicate and lootInfo.duplicate > 0 then
-						self:Print(format("%s (x%s) has already been announced. If this is a NEW duplicate item, please reclick to announce.", self.lootCache[lootID].link, self.lootCache[lootID].undistributed))
-					else
-						self:Print(format("%s has already been announced.", self.lootCache[lootID].link))
-					end
-				end
+				SimpleLoot:AnnounceLoot()
 			end
+		end
+	end
+end
+
+function SimpleLoot:AnnounceLoot()
+	local itemNum = 0
+	for lootID, lootInfo in pairs(self.lootCache) do
+		if self.lootCache[lootID] and lootInfo.quantity > 0 then
+			self:Print(format("Quantity: %s", lootInfo.quantity))
+			for x = 1, lootInfo.quantity do
+				-- Announce loot to candidates
+				self:ScheduleTimer("NewLoot", .6*(itemNum), lootInfo.link, lootInfo.slot, "drop")
+				lootInfo.quantity = lootInfo.quantity - 1
+				itemNum = itemNum + 1
+			end
+		elseif self.lootCache[lootID] and lootInfo.duplicate and lootInfo.duplicate > 0 then
+			self:Print(format("%s (x%s) has already been announced. If this is a NEW duplicate item, please reclick to announce.", self.lootCache[lootID].link, self.lootCache[lootID].undistributed))
+		else
+			self:Print(format("%s has already been announced.", self.lootCache[lootID].link))
 		end
 	end
 end
@@ -1155,10 +1164,11 @@ function SimpleLoot:LOOT_OPENED(event, arg)
 		local numLootItems = GetNumLootItems()
 
 		for itemSlot = 1, numLootItems do
-			local icon, name, quantity, rarity, locked = GetLootSlotInfo(itemSlot)
+			local lootIcon, lootName, lootQuantity, currencyID, lootQuality, locked, isQuestItem, questID, isActive = GetLootSlotInfo(itemSlot)
 			local itemLink = GetLootSlotLink(itemSlot)
 			local lootID = self:GetLootIDFromLink(itemLink)
-			if name and rarity and rarity >= GetLootThreshold() then
+            --check rarity threshold
+			if lootName and lootQuality and lootQuality >= GetLootThreshold() then			
 				-- Find out if there are any duplicates
 				local itemQuantity = 0
 				for slot = 1, numLootItems do
@@ -1175,6 +1185,9 @@ function SimpleLoot:LOOT_OPENED(event, arg)
 				end
 			end
 		end
+		
+		SimpleLoot:AnnounceLoot()
+		
 	end
 end
 

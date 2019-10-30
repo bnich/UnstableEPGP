@@ -48,10 +48,31 @@ local options = {
 					},
 					get = function(info) return SimpleLoot.db.profile.announceButton end, 
 					set = function(info, input) SimpleLoot.db.profile.announceButton = input end
-				},				
+				},	
 				description2 = {
 					type = "description",
 					order = 2.1,
+					name = "",
+				},
+				lootThreshold = {
+					type = "select",
+					order = 2.2,
+					name = "Loot Threshold:",
+					desc = "This option sets the loot rarity threshold for auto announce.",
+					style = "dropdown",
+					values = {
+						[2] = "Uncommon",
+						[3] = "Common",
+						[4] = "Rare",
+						[5] = "Epic",
+						[6] = "Legendary",
+					},
+					get = function(info) return SimpleLoot.db.profile.lootThreshold end, 
+					set = function(info, input) SimpleLoot.db.profile.lootThreshold = input end
+				},				
+				description3 = {
+					type = "description",
+					order = 2.3,
 					name = "",
 				},
 				autoAnnounceConfirm = {
