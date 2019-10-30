@@ -1144,7 +1144,6 @@ function SimpleLoot:AnnounceLoot()
 	local itemNum = 0
 	for lootID, lootInfo in pairs(self.lootCache) do
 		if self.lootCache[lootID] and lootInfo.quantity > 0 then
-			self:Print(format("Quantity: %s", lootInfo.quantity))
 			for x = 1, lootInfo.quantity do
 				-- Announce loot to candidates
 				self:ScheduleTimer("NewLoot", .6*(itemNum), lootInfo.link, lootInfo.slot, "drop")
