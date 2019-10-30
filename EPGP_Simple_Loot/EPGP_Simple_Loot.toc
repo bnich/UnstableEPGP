@@ -33,6 +33,8 @@ Libs\LibBabble-Inventory-3.0\lib.xml
 Libs\LibDeformat-3.0\lib.xml
 Libs\LibSmoothStatusBar-1.0\LibSmoothStatusBar-1.0.xml
 
+Libs\ArtTexturePaths\ArtTexturePaths-1.0.lua
+
 Libs\EPGP\LibDebug-1.0.lua
 Libs\EPGP\LibItemUtils-1.0.lua
 Libs\EPGP\LibGearPoints-1.2.lua
