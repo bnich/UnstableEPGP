@@ -1077,7 +1077,7 @@ function SimpleLoot:GetLootIDFromLink(itemLink)
 end
 
 function SimpleLoot:GetLootThreshold()
-    return EPGP.db.profile.lootThreshold
+    return self.db.profile.lootThreshold
 end
 
 function SimpleLoot:OPEN_MASTER_LOOT_LIST(announce)
@@ -1103,7 +1103,7 @@ buttonName = GetMouseButtonClicked()
 				local qualifiedItems = 0
 				for slot = 1, numLootItems do
 					local _,_,_, rarity = GetLootSlotInfo(slot)
-					if rarity and rarity >= GetLootThreshold() then
+					if rarity and rarity >= SimpleLoot:GetLootThreshold() then
 						qualifiedItems = qualifiedItems + 1
 					end
 				end
@@ -1168,7 +1168,7 @@ function SimpleLoot:LOOT_OPENED(event, arg)
 			local itemLink = GetLootSlotLink(itemSlot)
 			local lootID = self:GetLootIDFromLink(itemLink)
             --check rarity threshold
-			if lootName and lootQuality and lootQuality >= GetLootThreshold() then			
+			if lootName and lootQuality and lootQuality >= SimpleLoot:GetLootThreshold() then			
 				-- Find out if there are any duplicates
 				local itemQuantity = 0
 				for slot = 1, numLootItems do
