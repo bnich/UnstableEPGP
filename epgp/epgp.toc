@@ -52,12 +52,8 @@ epgp_options.lua
 epgp_recurring.lua
 popups.lua
 
-modules\announce.lua
-modules\boss.lua
 modules\gptooltip.lua
 modules\ldb.lua
 modules\log.lua
-modules\loot.lua
 modules\ui.lua
 modules\warnings.lua
-modules\whisper.lua
