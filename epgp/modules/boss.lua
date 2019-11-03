@@ -311,7 +311,6 @@ function mod:OnEnable()
     EPGP:Print(L["Using %s for boss kill tracking"]:format("DXE"))
     DXE.RegisterCallback(mod, "TriggerDefeat", dxeCallback)
   end
-  mod:DebugTest()
 end
 
 function mod:OnDisable()
