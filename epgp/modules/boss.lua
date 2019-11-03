@@ -48,17 +48,19 @@ mod.dbDefaults = {
   profile = {
     enabled = false,
     wipedetection = false,
-	epLucifron = 5,
-	epMagmadar = 5,
-	epGehennas = 5,
-	epGarr = 5,
-	epShazzrah = 5,
-	epBaronGeddon = 5,
-	epGolemag = 5,
-	epGolemag = 5,
-	epSulfuron = 5,
-	epMagmadar = 5,
-	epRagnaros = 7,
+	bossValues = {
+		["Lucifron"] = "5",
+		["Magmadar"] = "5",
+		["Gehennas"] = "5",
+		["Garr"] = "5",
+		["Shazzrah"] = "5",
+		["Baron Geddon"] = "5",
+		["Golemagg the Incinerator"] = "5",
+		["Sulfuron Harbinger"] = "5",
+		["Majordomo Executus"] = "5",
+		["Ragnaros"] = "7",
+		["Onyxia"] = "5",
+	},
   },
 }
 
@@ -93,9 +95,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Lucifron"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Lucifron"] = input end
   },
   description2 = {
 	type = "description",
@@ -109,9 +113,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Magmadar"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Magmadar"] = input end
   },
   description3 = {
 	type = "description",
@@ -125,9 +131,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Gehennas"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Gehennas"] = input end
   },
   description4 = {
 	type = "description",
@@ -141,9 +149,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Garr"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Garr"] = input end
   },
   description5 = {
 	type = "description",
@@ -157,9 +167,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Shazzrah"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Shazzrah"] = input end
   },
   description6 = {
 	type = "description",
@@ -173,9 +185,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Baron Geddon"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Baron Geddon"] = input end
   },
   description7 = {
 	type = "description",
@@ -189,9 +203,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Golemag the Incinerator"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Golemag the Incinerator"] = input end
   },
   description8 = {
 	type = "description",
@@ -205,9 +221,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Sulfuron Harbinger"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Sulfuron Harbinger"] = input end
   },
   description9 = {
 	type = "description",
@@ -221,9 +239,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Majordomo Executus"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Majordomo Executus"] = input end
   },
   description10 = {
 	type = "description",
@@ -237,9 +257,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Ragnaros"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Ragnaros"] = input end
   },
   description11 = {
 	type = "description",
@@ -253,9 +275,11 @@ mod.optionsArgs = {
 	desc = "The amount of EP to award to the raid.",
 	style = "dropdown",
 	values = {
-		[1] = "5",
-		[2] = "7",
+		[5] = "5",
+		[7] = "7",
 	},
+	get = function(info) return mod.db.profile.bossValues["Onyxia"] end, 
+	set = function(info, input) mod.db.profile.bossValues["Onyxia"] = input end
   },
 }
 
