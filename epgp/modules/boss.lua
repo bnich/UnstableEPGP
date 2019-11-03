@@ -6,7 +6,7 @@ local DLG = LibStub("LibDialog-1.0")
 
 local in_combat = false
 
-local function ShowPopup(event_name, boss_name)
+local function AwardBossEP(event_name, boss_name)
   while (in_combat or DLG:ActiveDialog("EPGP_BOSS_DEAD") or
          DLG:ActiveDialog("EPGP_BOSS_ATTEMPT")) do
     Coroutine:Sleep(0.1)
@@ -14,9 +14,9 @@ local function ShowPopup(event_name, boss_name)
 
   local dialog
   if event_name == "kill" or event_name == "BossKilled" then
-    DLG:Spawn("EPGP_BOSS_DEAD", boss_name)
+    EPGP:IncMassEPBy(boss_name, mod.db.profile.bossValues[boss_name])
   elseif event_name == "wipe" and mod.db.profile.wipedetection then
-    DLG:Spawn("EPGP_BOSS_ATTEMPT", boss_name)
+    EPGP:IncMassEPBy(boss_name, mod.db.profile.bossValues[boss_name])
   end
 end
 
@@ -26,7 +26,7 @@ local function BossAttempt(event_name, boss_name)
   if not mod:IsEnabled() then return end
 
   if CanEditOfficerNote() and EPGP:IsRLorML() then
-    Coroutine:RunAsync(ShowPopup, event_name, boss_name)
+    Coroutine:RunAsync(AwardBossEP, event_name, boss_name)
   end
 end
 
@@ -39,9 +39,7 @@ function mod:PLAYER_REGEN_ENABLED()
 end
 
 function mod:DebugTest()
-  BossAttempt("BossKilled", "Sapphiron")
-  BossAttempt("kill", "Bob")
-  BossAttempt("wipe", "Spongebob")
+  BossAttempt("kill", "Ragnaros")
 end
 
 mod.dbDefaults = {
@@ -313,6 +311,7 @@ function mod:OnEnable()
     EPGP:Print(L["Using %s for boss kill tracking"]:format("DXE"))
     DXE.RegisterCallback(mod, "TriggerDefeat", dxeCallback)
   end
+  mod:DebugTest()
 end
 
 function mod:OnDisable()
