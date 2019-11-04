@@ -752,11 +752,6 @@ function EPGP:OnInitialize()
   --
   self:SetupOptions()
 
-  -- New version note.
-  if self.db.global.last_version ~= EPGP.version then
-    self.db.global.last_version = EPGP.version
-    DLG:Spawn("EPGP_NEW_VERSION")
-  end
 end
 
 function EPGP:PLAYER_ENTERING_WORLD()
