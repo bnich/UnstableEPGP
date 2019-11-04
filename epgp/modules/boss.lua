@@ -6,18 +6,30 @@ local DLG = LibStub("LibDialog-1.0")
 
 local in_combat = false
 
+local function isEmpty(s)
+  return s == nil or s == ''
+end
+
 local function AwardBossEP(event_name, boss_name)
   while (in_combat) do
     Coroutine:Sleep(0.1)
   end
-  
-  print("Boss Name: " .. boss_name)
-  
-  if event_name == "kill" or event_name == "BossKilled" then
-    EPGP:IncMassEPBy(boss_name, mod.db.profile.bossValues[boss_name])
+    
+  if(not isEmpty(mod.db.profile.bossValues[boss_name])) then
+    if event_name == "kill" or event_name == "BossKilled" then
+      EPGP:IncMassEPBy(boss_name, mod.db.profile.bossValues[boss_name])
+    elseif event_name == "wipe" and mod.db.profile.wipedetection then
+      EPGP:IncMassEPBy(boss_name, mod.db.profile.bossValues[boss_name])
+    end
+  else
+    if event_name == "kill" or event_name == "BossKilled" then
+      DLG:Spawn("EPGP_BOSS_DEAD", boss_name)
   elseif event_name == "wipe" and mod.db.profile.wipedetection then
-    EPGP:IncMassEPBy(boss_name, mod.db.profile.bossValues[boss_name])
+      DLG:Spawn("EPGP_BOSS_ATTEMPT", boss_name)
+    end
   end
+  
+
 end
 
 local function BossAttempt(event_name, boss_name)
@@ -281,36 +293,21 @@ mod.optionsArgs = {
   },
 }
 
-local function dbmCallback(event, mod)
-  Debug("dbmCallback: %s %s", event, mod.combatInfo.name)
-  BossAttempt(event, mod.combatInfo.name)
-end
-
-local function bwCallback(event, module)
-  Debug("bwCallback: %s %s", event, module.displayName)
-  BossAttempt(event == "BigWigs_OnBossWin" and "kill" or "wipe", module.displayName)
-end
-
-local function dxeCallback(event, encounter)
-  Debug("dxeCallback: %s %s", event, encounter.name)
-  BossAttempt("kill", encounter.name)
-end
-
 function mod:OnEnable()
+
   self:RegisterEvent("PLAYER_REGEN_DISABLED")
   self:RegisterEvent("PLAYER_REGEN_ENABLED")
-  if DBM then
-    EPGP:Print(L["Using %s for boss kill tracking"]:format("DBM"))
-    DBM:RegisterCallback("kill", dbmCallback)
-    DBM:RegisterCallback("wipe", dbmCallback)
-  elseif BigWigsLoader then
-    EPGP:Print(L["Using %s for boss kill tracking"]:format("BigWigs"))
-    BigWigsLoader.RegisterMessage(self, "BigWigs_OnBossWin", bwCallback)
-    BigWigsLoader.RegisterMessage(self, "BigWigs_OnBossWipe", bwCallback)
-  elseif DXE then
-    EPGP:Print(L["Using %s for boss kill tracking"]:format("DXE"))
-    DXE.RegisterCallback(mod, "TriggerDefeat", dxeCallback)
-  end
+
+  EPGP:Print(L["Using %s for boss kill tracking"]:format("DBM"))
+  
+  DBM:RegisterCallback("DBM_Kill", function(event, data)
+		BossAttempt("kill", data.combatInfo.name)
+	end)
+	
+  DBM:RegisterCallback("DBM_Wipe", function(event, data)
+		BossAttempt("wipe", data.combatInfo.name)
+	end)
+
 end
 
 function mod:OnDisable()
