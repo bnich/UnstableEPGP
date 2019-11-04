@@ -1,6 +1,7 @@
 SimpleLoot = LibStub("AceAddon-3.0"):NewAddon("SimpleLoot", "AceEvent-3.0", "AceHook-3.0", "AceConsole-3.0", "AceComm-3.0", "AceTimer-3.0", "AceSerializer-3.0")
 local SimpleLoot = SimpleLoot
 local VERSION = GetAddOnMetadata('EPGP_SIMPLE_LOOT', 'Version')
+local updateNotified = false
 local ProtocolVersion = 110
 local ScrollingTable = LibStub("ScrollingTable")
 local GP = LibStub("LibGearPoints-1.0")
@@ -228,7 +229,8 @@ function SimpleLoot:OnEnable()
     if EPGP and EPGP.RegisterCallback then
         EPGP.RegisterCallback(self, "StandingsChanged")
     end
-	self:Print(format("Welcome to EPGP SimpleLoot %s", VERSION))
+	
+	self:SendMessage("SL_Version", "GUILD", "getversion")
 end
 
 function SimpleLoot:OnDisable()
@@ -262,8 +264,9 @@ function SimpleLoot:SlashProcessor(input)
 				self:Print(format("The [%s] command is only available to Master Looter.", command))
 			end
 		elseif command == "version" or command == "ver" then
+		    updateNotified = false
 			-- Displays version of addon from everyone in guild
-			self:Print(format("You are running version %s", VERSION))
+			self:Print(format("Version: %s", VERSION))
 			if self.groupType then
 				self:SendMessage("SL_Version", nil, "getversion")
 			else
@@ -573,8 +576,22 @@ function SimpleLoot:OnCommReceived(prefix, message, distribution, sender, cached
 		if version == "getversion" then
 			self:SendMessage("SL_Version", sender, VERSION)
 		else
-			self:Print(format("%s: %s", sender, version))
+			if(self.currentML and UnitIsUnit(self.currentML, "player")) then
+				self:Print(format("%s: %s", sender, version))
+			end
+		    SimpleLoot:HandleVersion(version)
 		end	
+	end
+end
+
+function SimpleLoot:HandleVersion(incVersion)
+	if(not updateNotified) then
+		local incMajor, incMinor = string.split(".", incVersion)
+		local curMajor, curMinor = string.split(".", VERSION)
+		if incMajor..incMinor > curMajor..curMinor then
+			self:Print(format("New version available: %s", incVersion))
+			updateNotified = true
+		end
 	end
 end
 
