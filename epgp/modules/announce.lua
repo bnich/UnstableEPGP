@@ -43,12 +43,12 @@ end
 
 function mod:EPAward(event_name, name, reason, amount, mass)
   if mass then return end
-  mod:Announce(L["%+d EP (%s) to %s"], amount, reason, EPGP:GetDisplayCharacterName(name))
+  mod:Announce("%s EP awarded to %s for %s", amount, EPGP:GetDisplayCharacterName(name), reason)
 end
 
 function mod:GPAward(event_name, name, reason, amount, mass)
   if mass then return end
-  mod:Announce("%s was awarded %s for %s GP!", EPGP:GetDisplayCharacterName(name), reason, amount)
+  mod:Announce("%s GP awarded to %s for %s", amount, EPGP:GetDisplayCharacterName(name), reason)
 end
 
 function mod:BankedItem(event_name, name, reason, amount, mass)
