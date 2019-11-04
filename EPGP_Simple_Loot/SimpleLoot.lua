@@ -684,14 +684,6 @@ function SimpleLoot:DisableEPGPPopup()
 			EPGP.db.profile.auto_loot = false
         end
     end
-
-    -- Disable the GP Popup on the new EPGP versions
-    if EPGP and EPGP.GetModule then
-        local loot = EPGP:GetModule("loot")
-        if loot and loot.Disable then
-            loot:Disable()
-        end
-    end
 end
 
 function SimpleLoot:StandingsChanged()
