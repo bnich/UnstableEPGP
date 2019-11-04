@@ -7,12 +7,12 @@ local DLG = LibStub("LibDialog-1.0")
 local in_combat = false
 
 local function AwardBossEP(event_name, boss_name)
-  while (in_combat or DLG:ActiveDialog("EPGP_BOSS_DEAD") or
-         DLG:ActiveDialog("EPGP_BOSS_ATTEMPT")) do
+  while (in_combat) do
     Coroutine:Sleep(0.1)
   end
-
-  local dialog
+  
+  print("Boss Name: " .. boss_name)
+  
   if event_name == "kill" or event_name == "BossKilled" then
     EPGP:IncMassEPBy(boss_name, mod.db.profile.bossValues[boss_name])
   elseif event_name == "wipe" and mod.db.profile.wipedetection then

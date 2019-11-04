@@ -23,11 +23,11 @@ function mod:AnnounceTo(medium, fmt, ...)
   end
 
   local msg = string.format(fmt, ...)
-  local str = "EPGP:"
+  local str = ""
   for _,s in pairs({strsplit(" ", msg)}) do
     if #str + #s >= 250 then
       SendChatMessage(str, medium, nil, channel)
-      str = "EPGP:"
+      str = ""
     end
     str = str .. " " .. s
   end
@@ -48,7 +48,7 @@ end
 
 function mod:GPAward(event_name, name, reason, amount, mass)
   if mass then return end
-  mod:Announce(L["%+d GP (%s) to %s"], amount, reason, EPGP:GetDisplayCharacterName(name))
+  mod:Announce("%s was awarded %s for %s GP!", EPGP:GetDisplayCharacterName(name), reason, amount)
 end
 
 function mod:BankedItem(event_name, name, reason, amount, mass)

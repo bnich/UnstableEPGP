@@ -607,7 +607,7 @@ function EPGP:IncGPBy(name, reason, amount, mass, undo)
   -- CanIncGPBy returns false
   assert(EPGP:CanIncGPBy(reason, amount) or mass or undo)
   assert(type(name) == "string")
-
+print("In IncGPBy")
   local ep, gp, main = self:GetEPGP(name)
   if not ep then
     self:Print(L["Ignoring GP change for unknown member %s"]:format(name))
@@ -616,6 +616,7 @@ function EPGP:IncGPBy(name, reason, amount, mass, undo)
   local _
   _, amount = AddEPGP(main or name, 0, amount)
   if amount then
+  print("In IncGPBy Fire GPAward")
     callbacks:Fire("GPAward", name, reason, amount, mass, undo)
   end
 

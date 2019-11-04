@@ -346,10 +346,10 @@ function SimpleLoot:RegisterLoot(itemID, itemData, candidateData, configData, ow
 	local lootTimeout = configData[1]
 	if retOK and not eligible then
 		-- If not eligible for loot, display a message and set timer to zero
-		self:Print(format("Auto-Passed: %s (not eligible)", itemData[2]))
 		if(self.currentML and UnitIsUnit(self.currentML, "player")) then
-		
+		  eligible = true
 		else
+		  self:Print(format("Auto-Passed: %s (not eligible)", itemData[2]))
 		  lootTimeout = 0
 		end
 	else
@@ -1250,8 +1250,9 @@ function SimpleLoot:AwardLoot(itemID, candidate, response, GP)
 			return
 		end
 	end
-	
+
 	local retOK = pcall(GiveMasterLoot, lootIndex, candidateIndex, lootID)
+	
 	if retOK or self.lootTable[itemID].announceType == "manual" then
 		if response == "winner" then
 			--EPGP:IncGPBy(Ambiguate(candidate, "none"), self.lootTable[itemID].link, GP)
