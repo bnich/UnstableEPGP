@@ -347,7 +347,11 @@ function SimpleLoot:RegisterLoot(itemID, itemData, candidateData, configData, ow
 	if retOK and not eligible then
 		-- If not eligible for loot, display a message and set timer to zero
 		self:Print(format("Auto-Passed: %s (not eligible)", itemData[2]))
-		lootTimeout = 0
+		if(self.currentML and UnitIsUnit(self.currentML, "player")) then
+		
+		else
+		  lootTimeout = 0
+		end
 	else
 		eligible = true
 	end
