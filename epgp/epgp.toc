@@ -35,12 +35,12 @@ libs\LibJSON-1.0\lib.xml
 libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 libs\LibRealmInfo\LibRealmInfo.lua
 
-LibDebug-1.0.lua
-LibCoroutine-1.0.lua
-LibItemUtils-1.0.lua
-LibGearPoints-1.2.lua
-LibGuildStorage-1.2.lua
-LibLootNotify-1.0.lua
+libs\LibDebug-1.0.lua
+libs\LibCoroutine-1.0.lua
+libs\LibItemUtils-1.0.lua
+libs\LibGearPoints-1.2.lua
+libs\LibGuildStorage-1.2.lua
+libs\LibLootNotify-1.0.lua
 
 libs\LibDialog-1.0\lib.xml
 

@@ -94,7 +94,7 @@ frame.msg:SetPoint("BOTTOM", frame.bottom, "TOP", 0, 8)
 
 frame.msg:SetMaxLines(10000)
 frame.msg:SetFading(false)
-frame.msg:SetFontObject("GameFontHighlightLeft")
+frame.msg:SetFontObject(GameFontHighlightLeft)
 frame.msg:EnableMouseWheel(true)
 
 -- Hook scrolling to scroll up down with mousewheel. shift mousewheel

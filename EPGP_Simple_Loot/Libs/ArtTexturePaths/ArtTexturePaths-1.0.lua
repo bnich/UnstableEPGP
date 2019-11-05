@@ -1,6 +1,3 @@
--- A library to compute Gear Points for items as described in
--- http://code.google.com/p/epgp/wiki/GearPoints
-
 local MAJOR_VERSION = "ArtTexturePaths-1.0"
 local MINOR_VERSION = 10200
 

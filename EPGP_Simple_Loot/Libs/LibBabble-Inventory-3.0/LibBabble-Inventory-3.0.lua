@@ -1,6 +1,6 @@
 --[[
 Name: LibBabble-Inventory-3.0
-Revision: $Rev: 183 $
+Revision: $Rev: 185 $
 Maintainers: ckknight, nevcairiel, Ackis
 Website: http://www.wowace.com/projects/libbabble-inventory-3-0/
 Dependencies: None
@@ -8,7 +8,7 @@ License: MIT
 ]]
 
 local MAJOR_VERSION = "LibBabble-Inventory-3.0"
-local MINOR_VERSION = 90000 + tonumber(("$Rev: 183 $"):match("%d+"))
+local MINOR_VERSION = 90000 + tonumber(("$Rev: 185 $"):match("%d+"))
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
 local lib = LibStub("LibBabble-3.0"):New(MAJOR_VERSION, MINOR_VERSION)
@@ -577,7 +577,7 @@ elseif GAME_LOCALE == "koKR" then
 	Cloth = "천",
 	Cogwheel = "맞물림 톱니", -- Needs review
 	Companion = "친구",
-	-- ["Companion Pets"] = "",
+	["Companion Pets"] = "애완동물", -- Needs review
 	Companions = "친구",
 	Consumable = "소비용품",
 	Container = "가방",
