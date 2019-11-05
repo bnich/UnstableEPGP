@@ -1,7 +1,7 @@
 local options = {
 	type = "group",
-	name = "UnstableLoot",
-	handler = UnstableLoot,
+	name = "UnstableEPGP",
+	handler = UnstableEPGP,
 	args = {
 		generalGroup = {
 			type = "group",
@@ -28,8 +28,8 @@ local options = {
 						[180] = "3 Minutes",
 						[300] = "5 Minutes",
 					},
-					get = function(info) return UnstableLoot.db.profile.lootTimeout end, 
-					set = function(info, input) UnstableLoot.db.profile.lootTimeout = input end
+					get = function(info) return UnstableEPGP.db.profile.lootTimeout end, 
+					set = function(info, input) UnstableEPGP.db.profile.lootTimeout = input end
 				},
 				description1 = {
 					type = "description",
@@ -40,14 +40,14 @@ local options = {
 					type = "select",
 					order = 2,
 					name = "Announce Button:",
-					desc = "This option sets button or button combination to announce loot. Please take note that on the first click of each new loot window, UnstableLoot will automatically announce ALL items.",
+					desc = "This option sets button or button combination to announce loot. Please take note that on the first click of each new loot window, UnstableEPGP will automatically announce ALL items.",
 					style = "dropdown",
 					values = {
 						[1] = "Left ALT + Click",
 						[2] = "Left Click",
 					},
-					get = function(info) return UnstableLoot.db.profile.announceButton end, 
-					set = function(info, input) UnstableLoot.db.profile.announceButton = input end
+					get = function(info) return UnstableEPGP.db.profile.announceButton end, 
+					set = function(info, input) UnstableEPGP.db.profile.announceButton = input end
 				},	
 				description2 = {
 					type = "description",
@@ -67,8 +67,8 @@ local options = {
 						[5] = "Epic",
 						[6] = "Legendary",
 					},
-					get = function(info) return UnstableLoot.db.profile.lootThreshold end, 
-					set = function(info, input) UnstableLoot.db.profile.lootThreshold = input end
+					get = function(info) return UnstableEPGP.db.profile.lootThreshold end, 
+					set = function(info, input) UnstableEPGP.db.profile.lootThreshold = input end
 				},				
 				description3 = {
 					type = "description",
@@ -80,9 +80,9 @@ local options = {
 					order = 3,
 					width = "full",
 					name = "Show \"Announce ALL\" Popup",
-					desc = "By default, UnstableLoot automatically announces ALL items on the first click of each new loot window. Enabling this option will override this behavior by providing a Yes/No Popup.",
-					get = function(info) return UnstableLoot.db.profile.announceConfirm end, 
-					set = function(info, input) UnstableLoot.db.profile.announceConfirm = input end
+					desc = "By default, UnstableEPGP automatically announces ALL items on the first click of each new loot window. Enabling this option will override this behavior by providing a Yes/No Popup.",
+					get = function(info) return UnstableEPGP.db.profile.announceConfirm end, 
+					set = function(info, input) UnstableEPGP.db.profile.announceConfirm = input end
 				},
 				description3 = {
 					type = "description",
@@ -95,8 +95,8 @@ local options = {
 					width = "full",
 					name = "Auto-Cancel on Loot Window Closure",
 					desc = "When enabled, this option will automatically cancel/close ALL existing loot announcements after closing the Blizzard loot window.",
-					get = function(info) return UnstableLoot.db.profile.autoCancel end, 
-					set = function(info, input) UnstableLoot.db.profile.autoCancel = input end
+					get = function(info) return UnstableEPGP.db.profile.autoCancel end, 
+					set = function(info, input) UnstableEPGP.db.profile.autoCancel = input end
 				},
 				description4 = {
 					type = "description",
@@ -109,8 +109,8 @@ local options = {
 					width = "full",
 					name = "Hide Candidate Responses While Selecting",
 					desc = "When enabled, this option will hide all resonses until after a selection has been made.",
-					get = function(info) return UnstableLoot.db.profile.hideResponses end, 
-					set = function(info, input) UnstableLoot.db.profile.hideResponses = input end
+					get = function(info) return UnstableEPGP.db.profile.hideResponses end, 
+					set = function(info, input) UnstableEPGP.db.profile.hideResponses = input end
 				},
 				description5 = {
 					type = "description",
@@ -123,8 +123,8 @@ local options = {
 					width = "full",
 					name = "Allow Re-Selection of Loot",
 					desc = "When enabled, this option will allow candidates to change their responses on eligible loot until the timer expires.",
-					get = function(info) return UnstableLoot.db.profile.allowReselect end, 
-					set = function(info, input) UnstableLoot.db.profile.allowReselect = input end
+					get = function(info) return UnstableEPGP.db.profile.allowReselect end, 
+					set = function(info, input) UnstableEPGP.db.profile.allowReselect = input end
 				}
 			}
 		},
@@ -140,8 +140,8 @@ local options = {
 					width = "full",
 					name = "Loot Auto-Advance",
 					desc = "When enabled, this option will allow automatic advancement to the next piece of eligible loot after a selection has been made.",
-					get = function(info) return UnstableLoot.db.profile.autoAdvance end, 
-					set = function(info, input) UnstableLoot.db.profile.autoAdvance = input end
+					get = function(info) return UnstableEPGP.db.profile.autoAdvance end, 
+					set = function(info, input) UnstableEPGP.db.profile.autoAdvance = input end
 				},
 				description1 = {
 					type = "description",
@@ -158,8 +158,8 @@ local options = {
 						["yes"] = "Tabbed",
 						["no"] = "Separate",
 					},
-					get = function(info) return UnstableLoot.db.profile.tabbedFrame end, 
-					set = function(info, input) UnstableLoot.db.profile.tabbedFrame = input UnstableLoot:ChangeDisplayMode() end
+					get = function(info) return UnstableEPGP.db.profile.tabbedFrame end, 
+					set = function(info, input) UnstableEPGP.db.profile.tabbedFrame = input UnstableEPGP:ChangeDisplayMode() end
 				}
 			}
 		},		
@@ -178,8 +178,8 @@ local options = {
 					min = 1,
 					max = 7,
 					step = 1,
-					get = function(info) return UnstableLoot.db.profile.buttonNum	end,
-					set = function(info, input)	UnstableLoot.db.profile.buttonNum = input	end
+					get = function(info) return UnstableEPGP.db.profile.buttonNum	end,
+					set = function(info, input)	UnstableEPGP.db.profile.buttonNum = input	end
 				},
 				buttonNum_description = {
 					type = "description",
@@ -191,9 +191,9 @@ local options = {
 					order = 2,
 					name = "Button 1",
 					desc = "This field sets the text for button 1.",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 1 end,
-					get = function(info) return UnstableLoot.db.profile.button1 end,
-					set = function(info, input) UnstableLoot.db.profile.button1 = input end
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 1 end,
+					get = function(info) return UnstableEPGP.db.profile.button1 end,
+					set = function(info, input) UnstableEPGP.db.profile.button1 = input end
 				},
 				button1_GP = {
 					type = "input",
@@ -201,22 +201,22 @@ local options = {
 					name = "Default GP:",
 					desc = "This field sets the default GP value for button 1. Enter actual GP value or a percentage (up to 100%). Empty signifies 100% value.",
 					width = "half",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 1 end,
-					get = function(info) return UnstableLoot.db.profile.button1_GP end,
-					set = function(info, input) UnstableLoot:ValidateAndSetGP(info, input) end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 1 end,
+					get = function(info) return UnstableEPGP.db.profile.button1_GP end,
+					set = function(info, input) UnstableEPGP:ValidateAndSetGP(info, input) end,
 				},
 				button1_color = {
 					type = "color",
 					order = 2.2,
 					name = "Text Color",
 					desc = "",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 1 end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 1 end,
 					hasAlpha = false,
 					get = function(info, r, g, b, a) 
-						return UnstableLoot:HexToRGBPerc(UnstableLoot.db.profile.button1_color)
+						return UnstableEPGP:HexToRGBPerc(UnstableEPGP.db.profile.button1_color)
 					end,
 					set = function(info, r, g, b, a)
-						UnstableLoot.db.profile.button1_color = UnstableLoot:RGBPercToHex(r, g, b)
+						UnstableEPGP.db.profile.button1_color = UnstableEPGP:RGBPercToHex(r, g, b)
 					end
 				},
 				button1_description = {
@@ -229,9 +229,9 @@ local options = {
 					order = 3,
 					name = "Button 2",
 					desc = "This field sets the text for button 2.",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 2 end,
-					get = function(info) return UnstableLoot.db.profile.button2 end,
-					set = function(info, input) UnstableLoot.db.profile.button2 = input end
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 2 end,
+					get = function(info) return UnstableEPGP.db.profile.button2 end,
+					set = function(info, input) UnstableEPGP.db.profile.button2 = input end
 				},
 				button2_GP = {
 					type = "input",
@@ -239,22 +239,22 @@ local options = {
 					name = "Default GP:",
 					desc = "This field sets the default GP value for button 2. Enter actual GP value or a percentage (up to 100%). Empty signifies 100% value.",
 					width = "half",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 2 end,
-					get = function(info) return UnstableLoot.db.profile.button2_GP end,
-					set = function(info, input) UnstableLoot:ValidateAndSetGP(info, input) end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 2 end,
+					get = function(info) return UnstableEPGP.db.profile.button2_GP end,
+					set = function(info, input) UnstableEPGP:ValidateAndSetGP(info, input) end,
 				},
 				button2_color = {
 					type = "color",
 					order = 3.2,
 					name = "Text Color",
 					desc = "",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 2 end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 2 end,
 					hasAlpha = false,
 					get = function(info, r, g, b, a) 
-						return UnstableLoot:HexToRGBPerc(UnstableLoot.db.profile.button2_color)
+						return UnstableEPGP:HexToRGBPerc(UnstableEPGP.db.profile.button2_color)
 					end,
 					set = function(info, r, g, b, a)
-						UnstableLoot.db.profile.button2_color = UnstableLoot:RGBPercToHex(r, g, b)
+						UnstableEPGP.db.profile.button2_color = UnstableEPGP:RGBPercToHex(r, g, b)
 					end
 				},
 				button2_description = {
@@ -267,9 +267,9 @@ local options = {
 					order = 4,
 					name = "Button 3",
 					desc = "This field sets the text for button 3.",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 3 end,
-					get = function(info) return UnstableLoot.db.profile.button3 end,
-					set = function(info, input) UnstableLoot.db.profile.button3 = input end
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 3 end,
+					get = function(info) return UnstableEPGP.db.profile.button3 end,
+					set = function(info, input) UnstableEPGP.db.profile.button3 = input end
 				},
 				button3_GP = {
 					type = "input",
@@ -277,22 +277,22 @@ local options = {
 					name = "Default GP:",
 					desc = "This field sets the default GP value for button 3. Enter actual GP value or a percentage (up to 100%). Empty signifies 100% value.",
 					width = "half",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 3 end,
-					get = function(info) return UnstableLoot.db.profile.button3_GP end,
-					set = function(info, input) UnstableLoot:ValidateAndSetGP(info, input) end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 3 end,
+					get = function(info) return UnstableEPGP.db.profile.button3_GP end,
+					set = function(info, input) UnstableEPGP:ValidateAndSetGP(info, input) end,
 				},
 				button3_color = {
 					type = "color",
 					order = 4.2,
 					name = "Text Color",
 					desc = "",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 3 end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 3 end,
 					hasAlpha = false,
 					get = function(info, r, g, b, a) 
-						return UnstableLoot:HexToRGBPerc(UnstableLoot.db.profile.button3_color)
+						return UnstableEPGP:HexToRGBPerc(UnstableEPGP.db.profile.button3_color)
 					end,
 					set = function(info, r, g, b, a)
-						UnstableLoot.db.profile.button3_color = UnstableLoot:RGBPercToHex(r, g, b)
+						UnstableEPGP.db.profile.button3_color = UnstableEPGP:RGBPercToHex(r, g, b)
 					end	
 				},
 				button3_description = {
@@ -305,9 +305,9 @@ local options = {
 					order = 5,
 					name = "Button 4",
 					desc = "This field sets the text for button 4.",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 4 end,					
-					get = function(info) return UnstableLoot.db.profile.button4 end,
-					set = function(info, input) UnstableLoot.db.profile.button4 = input end
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 4 end,					
+					get = function(info) return UnstableEPGP.db.profile.button4 end,
+					set = function(info, input) UnstableEPGP.db.profile.button4 = input end
 				},
 				button4_GP = {
 					type = "input",
@@ -315,22 +315,22 @@ local options = {
 					name = "Default GP:",
 					desc = "This field sets the default GP value for button 4. Enter actual GP value or a percentage (up to 100%). Empty signifies 100% value.",
 					width = "half",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 4 end,
-					get = function(info) return UnstableLoot.db.profile.button4_GP end,
-					set = function(info, input) UnstableLoot:ValidateAndSetGP(info, input) end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 4 end,
+					get = function(info) return UnstableEPGP.db.profile.button4_GP end,
+					set = function(info, input) UnstableEPGP:ValidateAndSetGP(info, input) end,
 				},
 				button4_color = {
 					type = "color",
 					order = 5.2,
 					name = "Text Color",
 					desc = "",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 4 end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 4 end,
 					hasAlpha = false,
 					get = function(info, r, g, b, a) 
-						return UnstableLoot:HexToRGBPerc(UnstableLoot.db.profile.button4_color)
+						return UnstableEPGP:HexToRGBPerc(UnstableEPGP.db.profile.button4_color)
 					end,
 					set = function(info, r, g, b, a)
-						UnstableLoot.db.profile.button4_color = UnstableLoot:RGBPercToHex(r, g, b)
+						UnstableEPGP.db.profile.button4_color = UnstableEPGP:RGBPercToHex(r, g, b)
 					end	
 				},
 				button4_description = {
@@ -343,9 +343,9 @@ local options = {
 					order = 6,
 					name = "Button 5",
 					desc = "This field sets the text for button 5.",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 5 end,					
-					get = function(info) return UnstableLoot.db.profile.button5 end,
-					set = function(info, input) UnstableLoot.db.profile.button5 = input end
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 5 end,					
+					get = function(info) return UnstableEPGP.db.profile.button5 end,
+					set = function(info, input) UnstableEPGP.db.profile.button5 = input end
 				},
 				button5_GP = {
 					type = "input",
@@ -353,22 +353,22 @@ local options = {
 					name = "Default GP:",
 					desc = "This field sets the default GP value for button 5. Enter actual GP value or a percentage (up to 100%). Empty signifies 100% value.",
 					width = "half",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 5 end,
-					get = function(info) return UnstableLoot.db.profile.button5_GP end,
-					set = function(info, input) UnstableLoot:ValidateAndSetGP(info, input) end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 5 end,
+					get = function(info) return UnstableEPGP.db.profile.button5_GP end,
+					set = function(info, input) UnstableEPGP:ValidateAndSetGP(info, input) end,
 				},
 				button5_color = {
 				type = "color",
 					order = 6.2,
 					name = "Text Color",
 					desc = "",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 5 end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 5 end,
 					hasAlpha = false,
 					get = function(info, r, g, b, a) 
-						return UnstableLoot:HexToRGBPerc(UnstableLoot.db.profile.button5_color)
+						return UnstableEPGP:HexToRGBPerc(UnstableEPGP.db.profile.button5_color)
 					end,
 					set = function(info, r, g, b, a)
-						UnstableLoot.db.profile.button5_color = UnstableLoot:RGBPercToHex(r, g, b)
+						UnstableEPGP.db.profile.button5_color = UnstableEPGP:RGBPercToHex(r, g, b)
 					end
 				},
 				button5_description = {
@@ -381,9 +381,9 @@ local options = {
 					order = 7,
 					name = "Button 6",
 					desc = "This field sets the text for button 6.",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 6 end,					
-					get = function(info) return UnstableLoot.db.profile.button6 end,
-					set = function(info, input) UnstableLoot.db.profile.button6 = input end
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 6 end,					
+					get = function(info) return UnstableEPGP.db.profile.button6 end,
+					set = function(info, input) UnstableEPGP.db.profile.button6 = input end
 				},
 				button6_GP = {
 					type = "input",
@@ -391,22 +391,22 @@ local options = {
 					name = "Default GP:",
 					desc = "This field sets the default GP value for button 6. Enter actual GP value or a percentage (up to 100%). Empty signifies 100% value.",
 					width = "half",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 6 end,
-					get = function(info) return UnstableLoot.db.profile.button6_GP end,
-					set = function(info, input) UnstableLoot:ValidateAndSetGP(info, input) end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 6 end,
+					get = function(info) return UnstableEPGP.db.profile.button6_GP end,
+					set = function(info, input) UnstableEPGP:ValidateAndSetGP(info, input) end,
 				},		
 				button6_color = {
 					type = "color",
 					order = 7.2,
 					name = "Text Color",
 					desc = "asdf",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 6 end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 6 end,
 					hasAlpha = false,
 					get = function(info, r, g, b, a) 
-						return UnstableLoot:HexToRGBPerc(UnstableLoot.db.profile.button6_color)
+						return UnstableEPGP:HexToRGBPerc(UnstableEPGP.db.profile.button6_color)
 					end,
 					set = function(info, r, g, b, a)
-						UnstableLoot.db.profile.button6_color = UnstableLoot:RGBPercToHex(r, g, b)
+						UnstableEPGP.db.profile.button6_color = UnstableEPGP:RGBPercToHex(r, g, b)
 					end	
 				},
 				button6_description = {
@@ -419,9 +419,9 @@ local options = {
 					order = 8,
 					name = "Button 6",
 					desc = "This field sets the text for button 6.",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 7 end,					
-					get = function(info) return UnstableLoot.db.profile.button7 end,
-					set = function(info, input) UnstableLoot.db.profile.button7 = input end
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 7 end,					
+					get = function(info) return UnstableEPGP.db.profile.button7 end,
+					set = function(info, input) UnstableEPGP.db.profile.button7 = input end
 				},
 				button7_GP = {
 					type = "input",
@@ -429,22 +429,22 @@ local options = {
 					name = "Default GP:",
 					desc = "This field sets the default GP value for button 6. Enter actual GP value or a percentage (up to 100%). Empty signifies 100% value.",
 					width = "half",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 7 end,
-					get = function(info) return UnstableLoot.db.profile.button7_GP end,
-					set = function(info, input) UnstableLoot:ValidateAndSetGP(info, input) end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 7 end,
+					get = function(info) return UnstableEPGP.db.profile.button7_GP end,
+					set = function(info, input) UnstableEPGP:ValidateAndSetGP(info, input) end,
 				},		
 				button7_color = {
 					type = "color",
 					order = 8.2,
 					name = "Text Color",
 					desc = "asdf",
-					hidden = function(info) return UnstableLoot.db.profile.buttonNum < 7 end,
+					hidden = function(info) return UnstableEPGP.db.profile.buttonNum < 7 end,
 					hasAlpha = false,
 					get = function(info, r, g, b, a) 
-						return UnstableLoot:HexToRGBPerc(UnstableLoot.db.profile.button7_color)
+						return UnstableEPGP:HexToRGBPerc(UnstableEPGP.db.profile.button7_color)
 					end,
 					set = function(info, r, g, b, a)
-						UnstableLoot.db.profile.button7_color = UnstableLoot:RGBPercToHex(r, g, b)
+						UnstableEPGP.db.profile.button7_color = UnstableEPGP:RGBPercToHex(r, g, b)
 					end	
 				},
 				button7_description = {
@@ -457,29 +457,29 @@ local options = {
 	}
 }
 
---local UnstableLoot = LibStub("AceAddon-3.0"):GetAddon("UnstableLoot")
-local config = LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("UnstableLoot", options, nil)
-local optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("UnstableLoot", "UnstableLoot") --dialog
-optionsFrame.default = function() UnstableLoot:ResetToDefaults() end
+--local UnstableEPGP = LibStub("AceAddon-3.0"):GetAddon("UnstableEPGP")
+local config = LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("UnstableEPGP", options, nil)
+local optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("UnstableEPGP", "UnstableEPGP") --dialog
+optionsFrame.default = function() UnstableEPGP:ResetToDefaults() end
 
-function UnstableLoot:ResetToDefaults()
+function UnstableEPGP:ResetToDefaults()
 	self.db:ResetProfile()
-	LibStub("AceConfigRegistry-3.0"):NotifyChange("UnstableLoot")
+	LibStub("AceConfigRegistry-3.0"):NotifyChange("UnstableEPGP")
 end
 
-function UnstableLoot:RGBPercToHex(r, g, b)
+function UnstableEPGP:RGBPercToHex(r, g, b)
 	r = r <= 1 and r >= 0 and r or 0
 	g = g <= 1 and g >= 0 and g or 0
 	b = b <= 1 and b >= 0 and b or 0
 	return string.format("%02x%02x%02x", r*255, g*255, b*255)
 end
 
-function UnstableLoot:HexToRGBPerc(hex)
+function UnstableEPGP:HexToRGBPerc(hex)
 	local rhex, ghex, bhex = string.sub(hex, 1, 2), string.sub(hex, 3, 4), string.sub(hex, 5, 6)
 	return tonumber(rhex, 16)/255, tonumber(ghex, 16)/255, tonumber(bhex, 16)/255
 end
 
-function UnstableLoot:ValidateAndSetGP(info, input)
+function UnstableEPGP:ValidateAndSetGP(info, input)
 	local number, percent = strmatch(input, '^(%d+)(%%?)$')
 
 	if number and percent ~= "" and tonumber(number) <= 100 then
