@@ -8,14 +8,14 @@ local GP = LibStub("LibGearPoints-1.0")
 local ItemUtils = LibStub("LibItemUtils-1.0")
 local SmoothBar = LibStub("LibSmoothStatusBar-1.0")
 local ArtTexturePaths = LibStub("ArtTexturePaths-1.0")
-
-local TT_H_1, TT_H_2 = "|cff00FF00".."Unstable EPGP".."|r", string.format("|cffFFFFFF%s|r", VERSION)
-local TT_ENTRY = "|cFFCFCFCF%s:|r %s" --|cffFFFFFF%s|r"
+local icon = LibStub("LibDBIcon-1.0")
 
 -- Create minimap button using LibDBIcon
-local bunnyLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Bunnies!", {
+local TT_H_1, TT_H_2 = "|cff00FF00".."Unstable EPGP".."|r", string.format("|cffFFFFFF%s|r", VERSION)
+local TT_ENTRY = "|cFFCFCFCF%s:|r %s" --|cffFFFFFF%s|r"
+local minimapLDB = LibStub("LibDataBroker-1.1"):NewDataObject("UnstableEPGP", {
 	type = "data source",
-	text = "Bunnies!",
+	text = "UnstableEPGP",
 	icon = "Interface\\Icons\\INV_capybara",
 	OnClick = function(self, button)
 		if button == "RightButton" then
@@ -30,16 +30,6 @@ local bunnyLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Bunnies!", {
 		tooltip:AddLine(format(TT_ENTRY, "Right Click", "Test Loot Window"))
 	end,
 })
-local icon = LibStub("LibDBIcon-1.0")
-
-function UnstableEPGP:CommandTheBunnies() 
-    self.db.profile.minimap.hide = not self.db.profile.minimap.hide 
-	if self.db.profile.minimap.hide then 
-		icon:Hide("Bunnies!") 
-	else 
-		icon:Show("Bunnies!") 
-	end 
-end
 
 -- Cache some functions locally for quicker access
 local mathRandom	= math.random
@@ -47,8 +37,6 @@ local mathFloor 	= math.floor
 
 function UnstableEPGP:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("UnstableEPGPDB")
-	icon:Register("Bunnies!", bunnyLDB, self.db.profile.minimap) 
-	self:RegisterChatCommand("bunnies", "CommandTheBunnies") 
 	self:RegisterChatCommand("un", "SlashProcessor")
 
 	self.recycledFrames = {}
@@ -106,7 +94,7 @@ function UnstableEPGP:OnInitialize()
 			lootTimeout			= 90,
 			useUnstableEPGP		= true,
 			
-			minimap				= { hide = false, }, 
+			minimap				= { hide = false, minimapPos = 218}, 
 		}
 	})
 
@@ -253,6 +241,10 @@ function UnstableEPGP:OnInitialize()
 			end)
 		end
 	end
+	
+	--register minimap button
+	icon:Register("UnstableEPGP", minimapLDB, UnstableEPGP.db.profile.minimap) 
+	
 end
 
 function UnstableEPGP:OnEnable()
