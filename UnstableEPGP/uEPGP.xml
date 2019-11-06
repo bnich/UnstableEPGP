@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-	<Script file="UnstableEPGP.lua"/>
+	<Script file="uEPGP.lua"/>
 	<Frame name="HelloWorldFrame" toplevel="false" movable="true" parent="UIParent" enableMouse="true" inherits="ButtonFrameTemplate" hidden="True">
 		<Scripts>
 			<OnLoad>
@@ -20,7 +20,7 @@
 				</Texture>
 			</Layer>
 			<Layer level="BORDER">
-				<FontString inherits="GameFontNormal" text="Unstable EPGP">
+				<FontString inherits="GameFontNormal" text="uEPGP">
 					<Anchors>
 						<Anchor point="TOP" relativeTo="HelloWorldFrame" x="0" y="-5"/>
 					</Anchors>

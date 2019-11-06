@@ -1,9 +1,9 @@
 ## Interface: 60200
-## Title: UnstableEPGP
+## Title: uEPGP
 ## Notes: A simplified loot distribution system for EPGP.
 ## Author: Waterwraith-Zul'Jin (SimpleLoot)
-## Version: 2.00
-## SavedVariables: UnstableEPGPDB
+## Version: 2.01
+## SavedVariables: uEPGPDB
 ## OptionalDeps: epgp
 
 libs\LibStub\LibStub.lua
@@ -42,7 +42,9 @@ libs\ArtTexturePaths\ArtTexturePaths-1.0.lua
 libs\LibDebug-1.0.lua
 libs\LibItemUtils-1.0.lua
 libs\LibGearPoints-1.2.lua
+libs\LibGuildStorage-1.2.lua
 
-UnstableEPGP.lua
-UnstableEPGP_Config.lua
+uEPGP.lua
+uEPGP_Config.lua
 
+modules\minimap.lua

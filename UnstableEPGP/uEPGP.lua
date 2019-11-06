@@ -1,6 +1,6 @@
-UnstableEPGP = LibStub("AceAddon-3.0"):NewAddon("UnstableEPGP", "AceEvent-3.0", "AceHook-3.0", "AceConsole-3.0", "AceComm-3.0", "AceTimer-3.0", "AceSerializer-3.0")
-local UnstableEPGP = UnstableEPGP
-local VERSION = GetAddOnMetadata('UnstableEPGP', 'Version')
+uEPGP = LibStub("AceAddon-3.0"):NewAddon("uEPGP", "AceEvent-3.0", "AceHook-3.0", "AceConsole-3.0", "AceComm-3.0", "AceTimer-3.0", "AceSerializer-3.0")
+local uEPGP = uEPGP
+local VERSION = GetAddOnMetadata('uEPGP', 'Version')
 local updateNotified = false
 local ProtocolVersion = 110
 local ScrollingTable = LibStub("ScrollingTable")
@@ -8,35 +8,64 @@ local GP = LibStub("LibGearPoints-1.0")
 local ItemUtils = LibStub("LibItemUtils-1.0")
 local SmoothBar = LibStub("LibSmoothStatusBar-1.0")
 local ArtTexturePaths = LibStub("ArtTexturePaths-1.0")
-local icon = LibStub("LibDBIcon-1.0")
+local GS = LibStub("LibGuildStorage-1.2")
+local Debug = LibStub("LibDebug-1.0")
+Debug:EnableDebugging()
 
--- Create minimap button using LibDBIcon
-local TT_H_1, TT_H_2 = "|cff00FF00".."Unstable EPGP".."|r", string.format("|cffFFFFFF%s|r", VERSION)
-local TT_ENTRY = "|cFFCFCFCF%s:|r %s" --|cffFFFFFF%s|r"
-local minimapLDB = LibStub("LibDataBroker-1.1"):NewDataObject("UnstableEPGP", {
-	type = "data source",
-	text = "UnstableEPGP",
-	icon = "Interface\\Icons\\INV_capybara",
-	OnClick = function(self, button)
-		if button == "RightButton" then
-			DEFAULT_CHAT_FRAME.editBox:SetText("/un test") ChatEdit_SendText(DEFAULT_CHAT_FRAME.editBox, 0)
-		else
-			DEFAULT_CHAT_FRAME.editBox:SetText("/epgp") ChatEdit_SendText(DEFAULT_CHAT_FRAME.editBox, 0)
-		end
-	end,
-	OnTooltipShow = function(tooltip)
-		tooltip:AddDoubleLine(TT_H_1, TT_H_2);
-		tooltip:AddLine(format(TT_ENTRY, "Left Click", "Open Standings"))
-		tooltip:AddLine(format(TT_ENTRY, "Right Click", "Test Loot Window"))
-	end,
-})
+uEPGP:SetDefaultModuleState(false)
+local modulePrototype = {
+  IsDisabled = function (self, i) return not self:IsEnabled() end,
+  SetEnabled = function (self, i, v)
+                 if v then
+                   Debug("Enabling module: %s", self:GetName())
+                   self:Enable()
+                 else
+                   Debug("Disabling module: %s", self:GetName())
+                   self:Disable()
+                 end
+                 self.db.profile.enabled = v
+               end,
+  GetDBVar = function (self, i) return self.db.profile[i[#i]] end,
+  SetDBVar = function (self, i, v) self.db.profile[i[#i]] = v end,
+}
+uEPGP:SetDefaultModulePrototype(modulePrototype)
 
 -- Cache some functions locally for quicker access
 local mathRandom	= math.random
 local mathFloor 	= math.floor
 
-function UnstableEPGP:OnInitialize()
-	self.db = LibStub("AceDB-3.0"):New("UnstableEPGPDB")
+local initialized = false
+function uEPGP:GUILD_ROSTER_UPDATE()
+  if not IsInGuild() then
+    Debug("Not in guild, disabling modules")
+    for name, module in uEPGP:IterateModules() do
+      module:Disable()
+    end
+  else
+    local guild = GetGuildInfo("player") or ""
+    if #guild == 0 then
+      GuildRoster()
+    else
+      --if self.db:GetCurrentProfile() ~= guild then
+      --  Debug("Setting DB profile to: %s", guild)
+      --  self.db:SetProfile(guild)
+      --end
+      if not initialized then
+        initialized = true
+        -- Enable all modules that are supposed to be enabled
+        for name, module in uEPGP:IterateModules() do
+          if not module.db or module.db.profile.enabled or not module.dbDefaults then
+            Debug("Enabling module (startup): %s", name)
+            module:Enable()
+          end
+        end
+      end
+    end
+  end
+end
+
+function uEPGP:OnInitialize()
+	self.db = LibStub("AceDB-3.0"):New("uEPGPDB")
 	self:RegisterChatCommand("un", "SlashProcessor")
 
 	self.recycledFrames = {}
@@ -92,9 +121,9 @@ function UnstableEPGP:OnInitialize()
 			autoCancel			= false,
 			hideResponses		= true,
 			lootTimeout			= 90,
-			useUnstableEPGP		= true,
-			
-			minimap				= { hide = false, minimapPos = 218}, 
+			useuEPGP		= true,
+			showVersionReplies	= false,
+		 
 		}
 	})
 
@@ -142,24 +171,24 @@ function UnstableEPGP:OnInitialize()
 	
 	self.scrollFrameCols = {
 		{["name"] = "Candidate",	["width"] = 75,	["align"] = "LEFT",
-			["DoCellUpdate"] = function(...) UnstableEPGP:DoCellUpdate(...) end},
+			["DoCellUpdate"] = function(...) uEPGP:DoCellUpdate(...) end},
 		{["name"] = "ilvl",			["width"] = 30,	["align"] = "LEFT"},	
 		{["name"] = "Response",		["width"] = 88,	["align"] = "LEFT",		["defaultsort"] = "dsc",	["sort"] = "dsc",	["sortnext"] = 4,
-			["DoCellUpdate"] = function(...) UnstableEPGP:DoCellUpdate(...) end},	
+			["DoCellUpdate"] = function(...) uEPGP:DoCellUpdate(...) end},	
 		{["name"] = " PR",			["width"] = 45,	["align"] = "LEFT",		["defaultsort"] = "asc",
-			["DoCellUpdate"] = function(...) UnstableEPGP:DoCellUpdate(...) end},
+			["DoCellUpdate"] = function(...) uEPGP:DoCellUpdate(...) end},
 		{["name"] = "Roll",			["width"] = 30,	["align"] = "LEFT"},
 		{["name"] = "",				["width"] = 21,	["align"] = "LEFT",
-			["DoCellUpdate"] = function(...) UnstableEPGP:DoCellUpdate(...) end},
+			["DoCellUpdate"] = function(...) uEPGP:DoCellUpdate(...) end},
 		{["name"] = "",				["width"] = 21,	["align"] = "LEFT",
-			["DoCellUpdate"] = function(...) UnstableEPGP:DoCellUpdate(...) end},
+			["DoCellUpdate"] = function(...) uEPGP:DoCellUpdate(...) end},
 	}
 
 	StaticPopupDialogs["CloseTabbedFrame"] = {
 		text = "Are you sure you want to close ALL tabs?",
 		button1 = "Yes",
 		button2 = "Cancel",
-		OnAccept = function(self, data) UnstableEPGP:CloseTabbedFrame(data) end,
+		OnAccept = function(self, data) uEPGP:CloseTabbedFrame(data) end,
 		timeout = 0,
 		whileDead	= true,
 		hideOnEscape = true,
@@ -170,8 +199,8 @@ function UnstableEPGP:OnInitialize()
 		text = "There are %s eligible items based on\nyour loot threshold settings.\nWould you like to announce ALL items?",
 		button1 = "Yes",
 		button2 = "No",
-		OnAccept = function() self.autoAnnounce = true UnstableEPGP:OPEN_MASTER_LOOT_LIST(true) end,
-		OnCancel = function() self.autoAnnounce = false UnstableEPGP:OPEN_MASTER_LOOT_LIST(true) end,
+		OnAccept = function() self.autoAnnounce = true uEPGP:OPEN_MASTER_LOOT_LIST(true) end,
+		OnCancel = function() self.autoAnnounce = false uEPGP:OPEN_MASTER_LOOT_LIST(true) end,
 		timeout = 0,
 		whileDead	= true,
 		hideOnEscape = true,
@@ -179,11 +208,11 @@ function UnstableEPGP:OnInitialize()
 	}
 
 	StaticPopupDialogs["NewMasterLooter"] = {
-		text = "You are Master Looter. Would you like to use \"UnstableEPGP\" to distribute loot?",
+		text = "You are Master Looter. Would you like to use \"uEPGP\" to distribute loot?",
 		button1 = "Yes",
 		button2 = "No",
-		OnAccept = function() UnstableEPGP.db.profile.useUnstableEPGP = true UnstableEPGP:DisableEPGPPopup() end,
-		OnCancel = function() UnstableEPGP.db.profile.useUnstableEPGP = false end,
+		OnAccept = function() uEPGP.db.profile.useuEPGP = true uEPGP:DisableEPGPPopup() end,
+		OnCancel = function() uEPGP.db.profile.useuEPGP = false end,
 		timeout = 0,
 		whileDead	= true,
 		hideOnEscape = true,
@@ -193,7 +222,7 @@ function UnstableEPGP:OnInitialize()
 	-- Warning if we're in a guild and we can edit officer notes but EPGP is not installed.
     if IsInGuild() and CanEditOfficerNote() and not EPGP then
         StaticPopupDialogs["EPGP_NotInstalled"] = {
-            text = "UnstableEPGP Notice! \r\n\r\n|cFFFF8080WARNING:|r You have \"UnstableEPGP\" enabled without the EPGP addon. \r\n\r\nPlease make sure you have EPGP installed and enabled. If you fail to do so, no GP can be awarded for looted items.",
+            text = "uEPGP Notice! \r\n\r\n|cFFFF8080WARNING:|r You have \"uEPGP\" enabled without the EPGP addon. \r\n\r\nPlease make sure you have EPGP installed and enabled. If you fail to do so, no GP can be awarded for looted items.",
             button1 = OKAY,
             OnAccept = function() end,
             timeout = 0,
@@ -210,19 +239,20 @@ function UnstableEPGP:OnInitialize()
     --self:RegisterEvent("UPDATE_MASTER_LOOT_LIST")
 	self:RegisterEvent("LOOT_OPENED")
 	self:RegisterEvent("LOOT_CLOSED")
+	self:RegisterEvent("GUILD_ROSTER_UPDATE")
 	self:RegisterEvent("GROUP_ROSTER_UPDATE", "GroupUpdate")
 	self:RegisterEvent("PARTY_LOOT_METHOD_CHANGED", "GroupUpdate")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "GroupUpdate")
 	self:RegisterEvent("UNIT_NAME_UPDATE", "GroupUpdate")
 	
 	-- Register Communications
-	self:RegisterComm("UN_NewItem")
-	self:RegisterComm("UN_Acknowledge")
-	self:RegisterComm("UN_Response")
-	self:RegisterComm("UN_Update")
-	self:RegisterComm("UN_Award")	
-	self:RegisterComm("UN_Close")
-	self:RegisterComm("UN_Version")		
+	self:RegisterComm("SL_NewItem")
+	self:RegisterComm("SL_Acknowledge")
+	self:RegisterComm("SL_Response")
+	self:RegisterComm("SL_Update")
+	self:RegisterComm("SL_Award")	
+	self:RegisterComm("SL_Close")
+	self:RegisterComm("SL_Version")		
 	
 	-- Hooks
 	self:Hook("GiveMasterLoot", true)
@@ -242,12 +272,11 @@ function UnstableEPGP:OnInitialize()
 		end
 	end
 	
-	--register minimap button
-	icon:Register("UnstableEPGP", minimapLDB, UnstableEPGP.db.profile.minimap) 
+	self:SetupOptions()
 	
 end
 
-function UnstableEPGP:OnEnable()
+function uEPGP:OnEnable()
 	if self.currentML and UnitIsUnit(self.currentML, "player") then
 		self:ScheduleTimer("DisableEPGPPopup", 2)
 	end
@@ -256,14 +285,14 @@ function UnstableEPGP:OnEnable()
         EPGP.RegisterCallback(self, "StandingsChanged")
     end
 	
-	self:SendMessage("UN_Version", "GUILD", "getversion")
+	self:SendMessage("SL_Version", "GUILD", "getversion")
 end
 
-function UnstableEPGP:OnDisable()
+function uEPGP:OnDisable()
 	self:Print("Addon Disabled")
 end
 
-function UnstableEPGP:SlashProcessor(input)
+function uEPGP:SlashProcessor(input)
 	local command, arg1, arg2 = self:GetArgs(input, 3, 1)
 	-- Changes all input to lowercase.
 	if command then
@@ -274,10 +303,12 @@ function UnstableEPGP:SlashProcessor(input)
 			else
 				self:Print(format("The [%s] command is only available to Master Looter.", command))
 			end
+		elseif command == "debug" then
+        Debug:Toggle()
 		elseif command == "config" or command == "c" or command == "options" or command == "o" then
 			-- Due to a Blizzard bug, you have to call this twice to open the correct panel the first time
-			InterfaceOptionsFrame_OpenToCategory("UnstableEPGP")
-			InterfaceOptionsFrame_OpenToCategory("UnstableEPGP")			
+			InterfaceOptionsFrame_OpenToCategory("uEPGP")
+			InterfaceOptionsFrame_OpenToCategory("uEPGP")			
 		elseif command == "announce" or command == "add" then
 			-- Only Master Looter can manually announce items
 			if self.currentML and UnitIsUnit(self.currentML, "player") or not self.groupType then
@@ -294,9 +325,9 @@ function UnstableEPGP:SlashProcessor(input)
 			-- Displays version of addon from everyone in guild
 			self:Print(format("Version: %s", VERSION))
 			if self.groupType then
-				self:SendMessage("UN_Version", nil, "getversion")
+				self:SendMessage("SL_Version", nil, "getversion")
 			else
-				self:SendMessage("UN_Version", "GUILD", "getversion")
+				self:SendMessage("SL_Version", "GUILD", "getversion")
 			end
 		else
 			self:Print("Invalid Command")
@@ -304,7 +335,7 @@ function UnstableEPGP:SlashProcessor(input)
 	end
 end
 
-function UnstableEPGP:TestLoot()
+function uEPGP:TestLoot()
 	-- Get test item (item link) from player
 	local item = GetInventoryItemLink("player", mathRandom(1, 19))
 	while not item do
@@ -313,7 +344,7 @@ function UnstableEPGP:TestLoot()
 	self:NewLoot(item, nil, "test")	
 end
 	
-function UnstableEPGP:NewLoot(item, slot, announceType)
+function uEPGP:NewLoot(item, slot, announceType)
 	local gp1, gp2 = GP:GetValue(item)	
 	local name, link, quality, ilevel, reqLevel, itemType, itemSubType, maxStack, equipLoc, texture, price = GetItemInfo(item)
 	local itemData = {name, link, quality, ilevel, reqLevel, itemType, itemSubType, maxStack, equipLoc, texture, price, announceType, gp1, gp2}
@@ -358,7 +389,7 @@ function UnstableEPGP:NewLoot(item, slot, announceType)
 	self:RegisterLoot(nil, itemData, candidateData, configData, GetUnitName("player", true))
 end
 
-function UnstableEPGP:RegisterLoot(itemID, itemData, candidateData, configData, owner)
+function uEPGP:RegisterLoot(itemID, itemData, candidateData, configData, owner)
 	-- Get owner class and class color
 	local _, ownerClass = UnitClass(owner)
 	local ownerColor = RAID_CLASS_COLORS[ownerClass]
@@ -477,13 +508,13 @@ function UnstableEPGP:RegisterLoot(itemID, itemData, candidateData, configData, 
 		self.lootTable[itemID].candidateData = candidateData
 		self.lootTable[itemID].configData = configData
 		-- Send "New Loot" message to candidates
-		self:SendMessage("UN_NewItem", nil, itemID, itemData, candidateData, configData, ProtocolVersion)
-		self:SendMessage("UN_Acknowledge", nil, playerData)
-		self:UN_Acknowledge(playerData, self:Disambiguate(UnitName("player")))
+		self:SendMessage("SL_NewItem", nil, itemID, itemData, candidateData, configData, ProtocolVersion)
+		self:SendMessage("SL_Acknowledge", nil, playerData)
+		self:SL_Acknowledge(playerData, self:Disambiguate(UnitName("player")))
 	end
 end
 
-function UnstableEPGP:SendMessage(command, target, ...)
+function uEPGP:SendMessage(command, target, ...)
 	local serializedData = self:Serialize(...)
 	if target and target ~= "PARTY" and target ~= "RAID" and target ~= "GUILD" and target ~= "OFFICER" and target ~= "BATTLEGROUND"  then
 		self:SendCommMessage(command, serializedData, "WHISPER", target)
@@ -496,11 +527,11 @@ function UnstableEPGP:SendMessage(command, target, ...)
 	end
 end
 
-function UnstableEPGP:OnCommReceived(prefix, message, distribution, sender, cachedMsg)
+function uEPGP:OnCommReceived(prefix, message, distribution, sender, cachedMsg)
 	local senderFullName = self:Disambiguate(sender)
 	local cMessage = {prefix, message, distribution, sender}
 	
-	if prefix == "UN_NewItem" and not UnitIsUnit(sender, "player") then
+	if prefix == "SL_NewItem" and not UnitIsUnit(sender, "player") then
 		local success, itemID, itemData, candidateData, configData, protocol = self:Deserialize(message)
 		if not success then
 			self:Print("Error: "..itemID)
@@ -508,7 +539,7 @@ function UnstableEPGP:OnCommReceived(prefix, message, distribution, sender, cach
 		end
 		
 		if protocol ~= ProtocolVersion then
-			self:SendMessage("UN_Response", nil, itemID, self.RESPONSE["outdated"].text, self.RESPONSE["outdated"].color)	
+			self:SendMessage("SL_Response", nil, itemID, self.RESPONSE["outdated"].text, self.RESPONSE["outdated"].color)	
 			return
 		end
 		
@@ -522,8 +553,8 @@ function UnstableEPGP:OnCommReceived(prefix, message, distribution, sender, cach
 			if self.lootTable[itemID] then
 				-- Send Response
 				local playerData = self:GetPlayerData(itemID)
-				self:SendMessage("UN_Acknowledge", nil, playerData)
-				self:UN_Acknowledge(playerData, self:Disambiguate(UnitName("player")))
+				self:SendMessage("SL_Acknowledge", nil, playerData)
+				self:SL_Acknowledge(playerData, self:Disambiguate(UnitName("player")))
 				
 				if self.msgCache[itemID] then
 					self:ProcessMsgCache(itemID)
@@ -531,7 +562,7 @@ function UnstableEPGP:OnCommReceived(prefix, message, distribution, sender, cach
 			end
 		end
 		
-	elseif prefix == "UN_Acknowledge" and not UnitIsUnit(sender, "player") then
+	elseif prefix == "SL_Acknowledge" and not UnitIsUnit(sender, "player") then
 		local success, playerData = self:Deserialize(message)
 		if not success then
 			self:Print("Error: "..playerData)
@@ -545,10 +576,10 @@ function UnstableEPGP:OnCommReceived(prefix, message, distribution, sender, cach
 		end
 		-- Only update response if the loot window is open	
 		if self.lootTable[itemID] then
-			self:UN_Acknowledge(playerData, senderFullName)
+			self:SL_Acknowledge(playerData, senderFullName)
 		end
 		
-	elseif prefix == "UN_Response" and not UnitIsUnit(sender, "player") then
+	elseif prefix == "SL_Response" and not UnitIsUnit(sender, "player") then
 		local success, itemID, response, color, updateTarget = self:Deserialize(message)
 		if not success then
 			self:Print("Error: "..itemID)
@@ -562,13 +593,13 @@ function UnstableEPGP:OnCommReceived(prefix, message, distribution, sender, cach
 		-- Only update response if the loot window is open	
 		if self.lootTable[itemID] then
 			if updateTarget then
-				self:UN_Response(itemID, response, color, updateTarget)
+				self:SL_Response(itemID, response, color, updateTarget)
 			else
-				self:UN_Response(itemID, response, color, senderFullName)
+				self:SL_Response(itemID, response, color, senderFullName)
 			end
 		end
 		
-	elseif prefix == "UN_Award" then
+	elseif prefix == "SL_Award" then
 		local success, itemID, itemLink, player, response, GP = self:Deserialize(message)
 			if not success then
 				self:Print("Error: "..itemID)
@@ -581,7 +612,7 @@ function UnstableEPGP:OnCommReceived(prefix, message, distribution, sender, cach
 			self:ScheduleTimer("DiscardLoot", 4, itemID, true)
 		end
 
-	elseif prefix == "UN_Close" and not UnitIsUnit(sender, "player") then
+	elseif prefix == "SL_Close" and not UnitIsUnit(sender, "player") then
 		local success, itemID = self:Deserialize(message)
 		if not success then
 			self:Print("Error: "..itemID)
@@ -592,7 +623,7 @@ function UnstableEPGP:OnCommReceived(prefix, message, distribution, sender, cach
 			self:DiscardLoot(itemID, false)
 		end
 	
-	elseif prefix == "UN_Version" and not UnitIsUnit(sender, "player") then
+	elseif prefix == "SL_Version" and not UnitIsUnit(sender, "player") then
 		local success, version = self:Deserialize(message)
 		if not success then
 			self:Print("Error: "..version)
@@ -600,17 +631,17 @@ function UnstableEPGP:OnCommReceived(prefix, message, distribution, sender, cach
 		end
 
 		if version == "getversion" then
-			self:SendMessage("UN_Version", sender, VERSION)
+			self:SendMessage("SL_Version", sender, VERSION)
 		else
-			if(self.currentML and UnitIsUnit(self.currentML, "player")) then
+			if(uEPGP.db.profile.showVersionReplies) then
 				self:Print(format("%s: %s", sender, version))
 			end
-		    UnstableEPGP:HandleVersion(version)
+		    uEPGP:HandleVersion(version)
 		end	
 	end
 end
 
-function UnstableEPGP:HandleVersion(incVersion)
+function uEPGP:HandleVersion(incVersion)
 	if(not updateNotified) then
 		local incMajor, incMinor = string.split(".", incVersion)
 		local curMajor, curMinor = string.split(".", VERSION)
@@ -621,10 +652,10 @@ function UnstableEPGP:HandleVersion(incVersion)
 	end
 end
 
-function UnstableEPGP:UN_Acknowledge(playerData, senderFullName)
+function uEPGP:SL_Acknowledge(playerData, senderFullName)
 	local itemID, response, color, randomNum, itemLevel, itemIcon1, itemLink1, itemIcon2, itemLink2 = unpack(playerData)
 	local frame = self.lootTable[itemID].frame 
-	local r, g, b = UnstableEPGP:HexToRGBPerc(color)
+	local r, g, b = uEPGP:HexToRGBPerc(color)
 	local responseColor = {["r"] = r, ["g"] = g, ["b"] = b, ["a"] = 1.0}
 		
 	if self.lootTable[itemID] then
@@ -648,10 +679,10 @@ function UnstableEPGP:UN_Acknowledge(playerData, senderFullName)
 	end
 end
 
-function UnstableEPGP:UN_Response(itemID, response, color, updateTarget)
+function uEPGP:SL_Response(itemID, response, color, updateTarget)
 	if self.lootTable[itemID] then
 		local candidate = self.lootTable[itemID].candidateIndex[updateTarget]
-		local r, g, b = UnstableEPGP:HexToRGBPerc(color)
+		local r, g, b = uEPGP:HexToRGBPerc(color)
 		local responseColor = {["r"] = r, ["g"] = g, ["b"] = b, ["a"] = 1.0}
 		self.lootTable[itemID].scrollData[candidate].cols[3].value = response
 		self.lootTable[itemID].scrollData[candidate].cols[3].color = responseColor
@@ -663,7 +694,7 @@ function UnstableEPGP:UN_Response(itemID, response, color, updateTarget)
 	end
 end
 
-function UnstableEPGP:GetPlayerData(itemID)
+function uEPGP:GetPlayerData(itemID)
 	-- Get player ilvl and equipped item(s) for display
 	local equipLoc = self.lootTable[itemID].equipLoc
 	local _, itemLevel = 0
@@ -689,7 +720,7 @@ function UnstableEPGP:GetPlayerData(itemID)
 	return playerData
 end
 
-function UnstableEPGP:GetTableCount(table)
+function uEPGP:GetTableCount(table)
 	local count = 0
 	for k, v in pairs(table) do
 		count = count + 1
@@ -697,13 +728,13 @@ function UnstableEPGP:GetTableCount(table)
 	return count
 end
 
-function UnstableEPGP:ClearTable(table)
+function uEPGP:ClearTable(table)
 	for k, v in pairs(table) do
 		table[k] = nil
 	end
 end
 
-function UnstableEPGP:CacheMessage(item, message)
+function uEPGP:CacheMessage(item, message)
 	if not self.msgCache[item] then
 		self.msgCache[item] = {}
 	end
@@ -711,7 +742,7 @@ function UnstableEPGP:CacheMessage(item, message)
 	--self:Print(format("There are %s messages in queue %s", #self.msgCache[item], item))
 end
 
-function UnstableEPGP:ProcessMsgCache(itemID)
+function uEPGP:ProcessMsgCache(itemID)
 	--self:Print("Trying to process cached items...")
 	if self.lootTable[itemID] then
 		for x = 1, #self.msgCache[itemID] do
@@ -724,8 +755,8 @@ function UnstableEPGP:ProcessMsgCache(itemID)
 	end
 end
 
-function UnstableEPGP:DisableEPGPPopup()
-    -- Disable "automatic loot tracking" popup in EPGP - Let UnstableEPGP handle all the GP stuff
+function uEPGP:DisableEPGPPopup()
+    -- Disable "automatic loot tracking" popup in EPGP - Let uEPGP handle all the GP stuff
     if EPGP and IsInGuild() then
 		if EPGP.db then
 			EPGP.db.profile.auto_loot = false
@@ -733,7 +764,7 @@ function UnstableEPGP:DisableEPGPPopup()
     end
 end
 
-function UnstableEPGP:StandingsChanged()
+function uEPGP:StandingsChanged()
 	-- Update EP, GP, and PR data
 	if #self.lootTable > 0 then
 		for item = 1, #self.lootTable do
@@ -754,7 +785,7 @@ function UnstableEPGP:StandingsChanged()
 	end
 end
 
-function UnstableEPGP:GetEPGP(player)
+function uEPGP:GetEPGP(player)
     if not EPGP or not EPGP.GetEPGP then
 		return nil, nil, nil, nil, nil
 	end
@@ -787,7 +818,7 @@ function UnstableEPGP:GetEPGP(player)
 	return ep, gp, alt, minEP, player
 end
 
-function UnstableEPGP:GetEP(player)
+function uEPGP:GetEP(player)
     local ep, gp = self:GetEPGP(player)
     if not ep then
 		return -1
@@ -795,7 +826,7 @@ function UnstableEPGP:GetEP(player)
     return ep or 0
 end
 
-function UnstableEPGP:GetGP(player)
+function uEPGP:GetGP(player)
     local ep, gp = self:GetEPGP(player)
     if not gp then
 		return -1
@@ -803,7 +834,7 @@ function UnstableEPGP:GetGP(player)
     return gp or 1
 end
 
-function UnstableEPGP:GetPR(player)
+function uEPGP:GetPR(player)
     local ep, gp = self:GetEPGP(player)
     if not gp or not ep then
 		return 0, 0, 0
@@ -815,7 +846,7 @@ function UnstableEPGP:GetPR(player)
 	end
 end
 
-function UnstableEPGP:DoCellUpdate(rowFrame, cellFrame, data, cols, row, realrow, column, fShow, table, ...)
+function uEPGP:DoCellUpdate(rowFrame, cellFrame, data, cols, row, realrow, column, fShow, table, ...)
 	if column == 1 then
 		-- Call the original DoCellUpdate function, then modify the cell after default update
 		table.DoCellUpdate(rowFrame, cellFrame, data, cols, row, realrow, column, fShow, table, ...)
@@ -831,7 +862,7 @@ function UnstableEPGP:DoCellUpdate(rowFrame, cellFrame, data, cols, row, realrow
 		-- Hide Responses until a selection has been made
 		if self.lootTable[table.itemID].hideResponses and not self.lootTable[table.itemID].buttonState and not UnitIsUnit(self.lootTable[table.itemID].owner, "player") and prefix > 9 then
 			cellFrame.text:SetText(string.sub(self.RESPONSE["selected"].text, 4))
-			cellFrame.text:SetTextColor(UnstableEPGP:HexToRGBPerc(self.RESPONSE["selected"].color))			
+			cellFrame.text:SetTextColor(uEPGP:HexToRGBPerc(self.RESPONSE["selected"].color))			
 		else
 			cellFrame.text:SetText(string.sub(response, 4))
 			if color then
@@ -893,7 +924,7 @@ function UnstableEPGP:DoCellUpdate(rowFrame, cellFrame, data, cols, row, realrow
 	end
 end
 
-function UnstableEPGP:ShowScrollMenu(rowFrame, cellFrame, data, cols, row, realrow, column, scrollingTable, itemID, button, ...)
+function uEPGP:ShowScrollMenu(rowFrame, cellFrame, data, cols, row, realrow, column, scrollingTable, itemID, button, ...)
 	if DropDownList1:IsShown() then
 		CloseDropDownMenus()
 	else
@@ -919,7 +950,7 @@ function UnstableEPGP:ShowScrollMenu(rowFrame, cellFrame, data, cols, row, realr
 					{text = "", disabled = true, notCheckable = true},
 					{text = "Other Options", isTitle = true, notCheckable = true},
 					{text = "Re-announce Loot", notCheckable = true, func = function()
-						self:SendMessage("UN_NewItem", candidate, itemID, self.lootTable[itemID].itemData, self.lootTable[itemID].candidateData, self.lootTable[itemID].configData, ProtocolVersion)
+						self:SendMessage("SL_NewItem", candidate, itemID, self.lootTable[itemID].itemData, self.lootTable[itemID].candidateData, self.lootTable[itemID].configData, ProtocolVersion)
 					end},
 					{text = "Change Response", notCheckable = true, hasArrow = true, menuList = {}},
 					{text = "Cancel", notCheckable = true, func = function() CloseDropDownMenus() end},
@@ -938,7 +969,7 @@ function UnstableEPGP:ShowScrollMenu(rowFrame, cellFrame, data, cols, row, realr
 				self.lootTable[itemID].menuTable[5 + buttonNum].func = function() self:AwardLoot(itemID, candidate, "bank") end
 				self.lootTable[itemID].menuTable[6 + buttonNum].func = function() self:AwardLoot(itemID, candidate, "disenchant") end
 				self.lootTable[itemID].menuTable[9 + buttonNum].func = function()
-					self:SendMessage("UN_NewItem", candidate, itemID,	self.lootTable[itemID].itemData, self.lootTable[itemID].candidateData, self.lootTable[itemID].configData, ProtocolVersion)
+					self:SendMessage("SL_NewItem", candidate, itemID,	self.lootTable[itemID].itemData, self.lootTable[itemID].candidateData, self.lootTable[itemID].configData, ProtocolVersion)
 				end
 				
 				local cost = self.lootTable[itemID].gpCost
@@ -958,8 +989,8 @@ function UnstableEPGP:ShowScrollMenu(rowFrame, cellFrame, data, cols, row, realr
 					self.lootTable[itemID].menuTable[3 + x].func = function() self:AwardLoot(itemID, candidate, "winner", trueCost) end
 					self.lootTable[itemID].menuTable[10 + buttonNum].menuList[x].text = self.lootTable[itemID]["button"..x] 
 					self.lootTable[itemID].menuTable[10 + buttonNum].menuList[x].func = function()
-						self:SendMessage("UN_Response", nil, itemID, format("1%s %s", x, self.lootTable[itemID]["button"..x]), self.lootTable[itemID]["button"..x.."c"], candidate)
-						self:UN_Response(itemID, format("1%s %s", x, self.lootTable[itemID]["button"..x]), self.lootTable[itemID]["button"..x.."c"], candidate)
+						self:SendMessage("SL_Response", nil, itemID, format("1%s %s", x, self.lootTable[itemID]["button"..x]), self.lootTable[itemID]["button"..x.."c"], candidate)
+						self:SL_Response(itemID, format("1%s %s", x, self.lootTable[itemID]["button"..x]), self.lootTable[itemID]["button"..x.."c"], candidate)
 						CloseDropDownMenus()
 					end
 				end
@@ -970,7 +1001,7 @@ function UnstableEPGP:ShowScrollMenu(rowFrame, cellFrame, data, cols, row, realr
 	end
 end
 
-function UnstableEPGP:UpdateSelectionButtons(itemID, state)
+function uEPGP:UpdateSelectionButtons(itemID, state)
 	if state then
 		self.lootTable[itemID].buttonState = state
 	end
@@ -1007,7 +1038,7 @@ function UnstableEPGP:UpdateSelectionButtons(itemID, state)
 	end
 end
 
-function UnstableEPGP:SelectionAutoAdvance()
+function uEPGP:SelectionAutoAdvance()
 	for x = 1, #self.lootTable do
 		if not self.lootTable[self.lootTable[x]].buttonState then
 			self:UpdateFrame(self.lootTable[x], x)
@@ -1016,7 +1047,7 @@ function UnstableEPGP:SelectionAutoAdvance()
 	end
 end
 
-function UnstableEPGP:ChangeDisplayMode()
+function uEPGP:ChangeDisplayMode()
 	if self.db.profile.tabbedFrame == "yes" then
 		if #self.lootTable > 0 then
 			for x = 1, #self.lootTable do
@@ -1041,7 +1072,7 @@ function UnstableEPGP:ChangeDisplayMode()
 	end
 end
 
-function UnstableEPGP:SecToMin(seconds)
+function uEPGP:SecToMin(seconds)
 	seconds = mathFloor(seconds)
 	if seconds > 59 then
 		myMinutes = mathFloor(seconds/60)
@@ -1054,7 +1085,7 @@ function UnstableEPGP:SecToMin(seconds)
 	return myTime
 end
 
-function UnstableEPGP:TimerFeedback(itemID)
+function uEPGP:TimerFeedback(itemID)
 	self.lootTable[itemID].timeRemaining = self.lootTable[itemID].timeRemaining - 1
 	local frame = self.lootTable[itemID].frame
 	local timerValue = (self.lootTable[itemID].timeRemaining/self.lootTable[itemID].lootTimeout)*100
@@ -1069,8 +1100,8 @@ function UnstableEPGP:TimerFeedback(itemID)
 	if timerValue <= 0 then
 		if not self.lootTable[itemID].allowReselect or not self.lootTable[itemID].buttonState then
 			self.lootTable[itemID].buttonState = 9
-			self:SendMessage("UN_Response", nil, itemID, self.RESPONSE["autopass"].text, self.RESPONSE["autopass"].color)
-			self:UN_Response(itemID, self.RESPONSE["autopass"].text, self.RESPONSE["autopass"].color, self:Disambiguate(UnitName("player")))
+			self:SendMessage("SL_Response", nil, itemID, self.RESPONSE["autopass"].text, self.RESPONSE["autopass"].color)
+			self:SL_Response(itemID, self.RESPONSE["autopass"].text, self.RESPONSE["autopass"].color, self:Disambiguate(UnitName("player")))
 		end
 		self:UpdateSelectionButtons(itemID, 9)
 		self:CancelTimer(self.lootTable[itemID].timer)
@@ -1078,7 +1109,7 @@ function UnstableEPGP:TimerFeedback(itemID)
 end
 
 -- Makes all character names consistent
-function UnstableEPGP:Disambiguate(name)
+function uEPGP:Disambiguate(name)
 	-- Get realm name; remove dashes and spaces so other functions will work
 	local realmName = gsub(gsub(GetRealmName(), '-', ''), ' ', '')
 	local playerName = Ambiguate(name, "none")
@@ -1090,7 +1121,7 @@ function UnstableEPGP:Disambiguate(name)
 	return playerName
 end
 
-function UnstableEPGP:AnnounceButton(buttonName)
+function uEPGP:AnnounceButton(buttonName)
 	if self.db.profile.announceButton == 1 and IsLeftAltKeyDown() then
 		return true
 	elseif self.db.profile.announceButton == 2 and buttonName == "LeftButton" then
@@ -1100,7 +1131,7 @@ function UnstableEPGP:AnnounceButton(buttonName)
 	end		
 end
 
-function UnstableEPGP:GetLootIDFromLink(itemLink)
+function uEPGP:GetLootIDFromLink(itemLink)
     if not itemLink then
 		return
 	end
@@ -1115,13 +1146,13 @@ function UnstableEPGP:GetLootIDFromLink(itemLink)
     return lootID
 end
 
-function UnstableEPGP:GetLootThreshold()
+function uEPGP:GetLootThreshold()
     return self.db.profile.lootThreshold
 end
 
-function UnstableEPGP:OPEN_MASTER_LOOT_LIST(announce)
+function uEPGP:OPEN_MASTER_LOOT_LIST(announce)
 buttonName = GetMouseButtonClicked()
-	if self.db.profile.useUnstableEPGP and self.currentML then
+	if self.db.profile.useuEPGP and self.currentML then
 		-- Close default Blizzard popup unless RIGHT ALT key is pressed
 		if not IsRightAltKeyDown() then
 			CloseDropDownMenus()
@@ -1142,7 +1173,7 @@ buttonName = GetMouseButtonClicked()
 				local qualifiedItems = 0
 				for slot = 1, numLootItems do
 					local _,_,_, rarity = GetLootSlotInfo(slot)
-					if rarity and rarity >= UnstableEPGP:GetLootThreshold() then
+					if rarity and rarity >= uEPGP:GetLootThreshold() then
 						qualifiedItems = qualifiedItems + 1
 					end
 				end
@@ -1173,13 +1204,13 @@ buttonName = GetMouseButtonClicked()
 				end
 			elseif self.autoAnnounce == true then
 				self.autoAnnounce = false
-				UnstableEPGP:AnnounceLoot()
+				uEPGP:AnnounceLoot()
 			end
 		end
 	end
 end
 
-function UnstableEPGP:AnnounceLoot()
+function uEPGP:AnnounceLoot()
 	local itemNum = 0
 	for lootID, lootInfo in pairs(self.lootCache) do
 		if self.lootCache[lootID] and lootInfo.quantity > 0 then
@@ -1197,8 +1228,8 @@ function UnstableEPGP:AnnounceLoot()
 	end
 end
 
-function UnstableEPGP:LOOT_OPENED(event, arg)
-	if self.db.profile.useUnstableEPGP and self.currentML and UnitIsUnit(self.currentML, "player") then
+function uEPGP:LOOT_OPENED(event, arg)
+	if self.db.profile.useuEPGP and self.currentML and UnitIsUnit(self.currentML, "player") then
 		local numLootItems = GetNumLootItems()
 
 		for itemSlot = 1, numLootItems do
@@ -1206,7 +1237,7 @@ function UnstableEPGP:LOOT_OPENED(event, arg)
 			local itemLink = GetLootSlotLink(itemSlot)
 			local lootID = self:GetLootIDFromLink(itemLink)
             --check rarity threshold
-			if lootName and lootQuality and lootQuality >= UnstableEPGP:GetLootThreshold() then			
+			if lootName and lootQuality and lootQuality >= uEPGP:GetLootThreshold() then			
 				-- Find out if there are any duplicates
 				local itemQuantity = 0
 				for slot = 1, numLootItems do
@@ -1224,13 +1255,13 @@ function UnstableEPGP:LOOT_OPENED(event, arg)
 			end
 		end
 		
-		UnstableEPGP:AnnounceLoot()
+		uEPGP:AnnounceLoot()
 		
 	end
 end
 
-function UnstableEPGP:LOOT_CLOSED()
-	if self.db.profile.useUnstableEPGP and self.currentML and UnitIsUnit(self.currentML, "player") then
+function uEPGP:LOOT_CLOSED()
+	if self.db.profile.useuEPGP and self.currentML and UnitIsUnit(self.currentML, "player") then
 		-- Reset Auto Announce once loot frame is closed
 		self.autoAnnounce = nil
 		-- Counts the number of times the loot window has been opened between lootCache resets
@@ -1250,13 +1281,29 @@ function UnstableEPGP:LOOT_CLOSED()
 			for x = itemCount, 1, -1 do
 				local itemID = self.lootTable[x]
 				self:DiscardLoot(itemID, false)
-				self:SendMessage("UN_Close", nil, itemID)
+				self:SendMessage("SL_Close", nil, itemID)
 			end
 		end
 	end
 end
 
-function UnstableEPGP:AwardLoot(itemID, candidate, response, GP)
+function uEPGP:CanIncGPBy(reason, amount)
+  if not CanEditOfficerNote() or not GS:IsCurrentState() then
+    return false
+  end
+  if type(reason) ~= "string" or type(amount) ~= "number" or #reason == 0 then
+    return false
+  end
+  if amount ~= math.floor(amount + 0.5) then
+    return false
+  end
+  if amount < -99999 or amount > 99999 or amount == 0 then
+    return false
+  end
+  return true
+end
+
+function uEPGP:AwardLoot(itemID, candidate, response, GP)
 	-- Ignore test items
 	if self.lootTable[itemID].announceType == "test" then
 		return
@@ -1302,8 +1349,8 @@ function UnstableEPGP:AwardLoot(itemID, candidate, response, GP)
 			EPGP:IncGPBy(candidate, self.lootTable[itemID].link, GP)
 		end
 		self.lootTable[itemID].winner = candidate
-		self:SendMessage("UN_Response", nil, itemID, self.RESPONSE[response].text, self.RESPONSE[response].color, candidate)
-		self:SendMessage("UN_Award", nil, itemID, self.lootTable[itemID].link, candidate, response, GP)		
+		self:SendMessage("SL_Response", nil, itemID, self.RESPONSE[response].text, self.RESPONSE[response].color, candidate)
+		self:SendMessage("SL_Award", nil, itemID, self.lootTable[itemID].link, candidate, response, GP)		
 		if self.lootTable[itemID].announceType == "manual" then
 			self:Print(format("Manually announced items must be delivered via trade. Please deliver %s to %s.", self.lootTable[itemID].link, candidate))
 		end
@@ -1314,7 +1361,7 @@ function UnstableEPGP:AwardLoot(itemID, candidate, response, GP)
 	end
 end
 
-function UnstableEPGP:GiveMasterLoot(lootIndex, candidateIndex, lootID)
+function uEPGP:GiveMasterLoot(lootIndex, candidateIndex, lootID)
 	if lootID and self.lootCache[lootID] then
 		self.lootCache[lootID].undistributed = self.lootCache[lootID].undistributed - 1
 		if self.lootCache[lootID].quantity == 0 and self.lootCache[lootID].undistributed == 0 then
@@ -1323,7 +1370,7 @@ function UnstableEPGP:GiveMasterLoot(lootIndex, candidateIndex, lootID)
 	end
 end
 
-function UnstableEPGP:EligibleCandidate(candidateData)
+function uEPGP:EligibleCandidate(candidateData)
 	if not candidateData then
 		return false
 	end	
@@ -1337,7 +1384,7 @@ function UnstableEPGP:EligibleCandidate(candidateData)
 end
 
 -- Close ALL tabs and frame
-function UnstableEPGP:CloseTabbedFrame(frame)
+function uEPGP:CloseTabbedFrame(frame)
 	if frame then
 		frame:Hide()
 		StaticPopup_Hide("CloseTabbedFrame")
@@ -1347,11 +1394,11 @@ function UnstableEPGP:CloseTabbedFrame(frame)
 		for x = #self.lootTable, 1, -1 do
 			local itemID = self.lootTable[x]
 			if UnitIsUnit(self.lootTable[itemID].owner, "player") then
-				self:SendMessage("UN_Close", nil, itemID)
+				self:SendMessage("SL_Close", nil, itemID)
 			else
 				-- When closing the window, only update response to "Pass" if no selection was made
 				if not self.lootTable[itemID].buttonState then
-					self:SendMessage("UN_Response", nil, itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color)
+					self:SendMessage("SL_Response", nil, itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color)
 				end
 				tinsert(self.lootHist, self.lootTable[itemID])
 			end
@@ -1372,7 +1419,7 @@ function UnstableEPGP:CloseTabbedFrame(frame)
 end
 
 -- Hide and recycle old frames
-function UnstableEPGP:DiscardLoot(itemID, addToHistory)
+function uEPGP:DiscardLoot(itemID, addToHistory)
 	if itemID then
 		CloseDropDownMenus()
 		local frame = self.lootTable[itemID].frame
@@ -1438,7 +1485,7 @@ function UnstableEPGP:DiscardLoot(itemID, addToHistory)
 	end
 end
 
-function UnstableEPGP:TableInvert(table)
+function uEPGP:TableInvert(table)
 	local inverted = {}
 	for key, value in pairs(table) do
 		inverted[value] = key
@@ -1446,7 +1493,7 @@ function UnstableEPGP:TableInvert(table)
 	return inverted
 end
 
-function UnstableEPGP:GroupUpdate()
+function uEPGP:GroupUpdate()
 	local lootMethod, ML_PartyID, ML_RaidID = GetLootMethod()
 	local inInstance, instanceType = IsInInstance()
 	self.groupSize = GetNumGroupMembers()
@@ -1483,14 +1530,14 @@ function UnstableEPGP:GroupUpdate()
 		end
 	else
 		--self:Print("You are in a " .. self.groupType .. " group with NO Master Looter.")
-		self.db.profile.useUnstableEPGP = false
+		self.db.profile.useuEPGP = false
 		if self.currentML then
 			self.currentML = nil
 		end
 	end
 end
 
-function UnstableEPGP:MasterLooterUpdate(masterLooter, realm)
+function uEPGP:MasterLooterUpdate(masterLooter, realm)
 	if masterLooter and masterLooter ~= "Unknown" then
 		if realm and realm ~= nil and realm ~= "" then
 			masterLooter = masterLooter.."-"..realm
@@ -1498,17 +1545,17 @@ function UnstableEPGP:MasterLooterUpdate(masterLooter, realm)
 		if self.currentML ~= masterLooter then
 			self.currentML = masterLooter
 			if UnitIsUnit(self.currentML, "player") then
-				if not self.db.profile.useUnstableEPGP then
+				if not self.db.profile.useuEPGP then
 					StaticPopup_Show("NewMasterLooter")
 				end
 			else
-				self.db.profile.useUnstableEPGP = false
+				self.db.profile.useuEPGP = false
 			end
 		end
 	end
 end
 
-function UnstableEPGP:UpdateTabs()
+function uEPGP:UpdateTabs()
 	local lootCount = #self.lootTable
 	local frame = self.tabbedFrame
 	
@@ -1540,7 +1587,7 @@ function UnstableEPGP:UpdateTabs()
 	end		
 end
 
-function UnstableEPGP:ShowLoot(itemID)
+function uEPGP:ShowLoot(itemID)
 	if self.db.profile.tabbedFrame == "yes" then
 		if not self.tabbedFrame then
 			self:GetLootFrame(itemID)
@@ -1557,11 +1604,11 @@ function UnstableEPGP:ShowLoot(itemID)
 	end	
 end
 
-function UnstableEPGP:GetLootFrame(itemID)
+function uEPGP:GetLootFrame(itemID)
 	local frame = tremove(self.recycledFrames)
 	if not frame then
 		-- Create Main Frame
-		frame = CreateFrame("Frame", "Mimic EPGP UnstableEPGP", UIParent, "BasicFrameTemplate")
+		frame = CreateFrame("Frame", "Mimic EPGP uEPGP", UIParent, "BasicFrameTemplate")
 		frame.number = self.frameNum
 		
 		frame:SetFrameStrata("HIGH")
@@ -1576,34 +1623,34 @@ function UnstableEPGP:GetLootFrame(itemID)
 		frame:SetScript("OnDragStart", frame.StartMoving)
 		frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
 					
-		frame.title = frame:CreateFontString("UN_Title", "BORDER", "GameFontNormal")
+		frame.title = frame:CreateFontString("SL_Title", "BORDER", "GameFontNormal")
 		frame.title:SetPoint("TOP", frame, "TOP", 0, -5)
-		frame.title:SetText("UnstableEPGP")
+		frame.title:SetText("uEPGP")
 		
 		-- Create Loot Button and Icon
-		local lootButton = CreateFrame("Button", "UN_LootButton", frame, "ActionButtonTemplate")
+		local lootButton = CreateFrame("Button", "SL_LootButton", frame, "ActionButtonTemplate")
 		lootButton:SetSize(40, 40)
 		lootButton:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -45)
 		lootButton:RegisterForClicks("AnyUp")
 		frame.lootButton = lootButton
 	
 		-- Create Item Label
-		local label = lootButton:CreateFontString("UN_LootLabel"..self.frameNum, "OVERLAY", "GameTooltipHeaderText")
+		local label = lootButton:CreateFontString("SL_LootLabel"..self.frameNum, "OVERLAY", "GameTooltipHeaderText")
 		label:SetPoint("LEFT", lootButton, "RIGHT", 10, 14)
 		frame.lootButton.label = label
 		
 		-- Create GP Label
-		local GP_Label = lootButton:CreateFontString("UN_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormal")
+		local GP_Label = lootButton:CreateFontString("SL_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormal")
 		GP_Label:SetPoint("TOPLEFT", frame, "TOPLEFT", 69, -61)
 		frame.lootButton.GP_Label = GP_Label
 		
 		-- Create ML Label
-		local ML_Label = lootButton:CreateFontString("UN_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormalSmall")
+		local ML_Label = lootButton:CreateFontString("SL_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormalSmall")
 		ML_Label:SetPoint("TOPLEFT", GP_Label, "BOTTOMLEFT", 1, -2)
 		frame.lootButton.ML_Label = ML_Label
 	
 		-- Create Owner Label
-		local OwnerLabel = lootButton:CreateFontString("UN_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormalSmall")
+		local OwnerLabel = lootButton:CreateFontString("SL_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormalSmall")
 		OwnerLabel:SetPoint("LEFT", ML_Label, "RIGHT", 0, 0)
 		frame.lootButton.OwnerLabel = OwnerLabel
 	
@@ -1639,36 +1686,36 @@ function UnstableEPGP:GetLootFrame(itemID)
 		timerBar.border:SetTexture("Interface\\CastingBar\\UI-CastingBar-Border")
 		timerBar.border:SetTexCoord(0, 1, 0, 1)
 		
-		timerBar.time = timerBar:CreateFontString("UN_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormal")
+		timerBar.time = timerBar:CreateFontString("SL_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormal")
 		timerBar.time:SetPoint("LEFT", timerBar, "RIGHT", 20, 0)
 		frame.timerBar = timerBar
 
 		-- Create Selection Buttons 1-6 (Need, Greed, Minor Upgrade, etc.)
-		frame.button1 = CreateFrame("Button", "UN_Button1", frame, "UIPanelButtonTemplate")
+		frame.button1 = CreateFrame("Button", "SL_Button1", frame, "UIPanelButtonTemplate")
 		frame.button1:SetSize(145,23)
 		frame.button1:SetPoint("TOPLEFT", frame, "TOPLEFT", 24, -123)
 				
-		frame.button2 = CreateFrame("Button", "UN_Button2", frame, "UIPanelButtonTemplate")
+		frame.button2 = CreateFrame("Button", "SL_Button2", frame, "UIPanelButtonTemplate")
 		frame.button2:SetSize(145,23)
 		frame.button2:SetPoint("TOPLEFT", frame.button1, "TOPRIGHT", 10, 0)
 				
-		frame.button3 = CreateFrame("Button", "UN_Button3", frame, "UIPanelButtonTemplate")
+		frame.button3 = CreateFrame("Button", "SL_Button3", frame, "UIPanelButtonTemplate")
 		frame.button3:SetSize(145,23)
 		frame.button3:SetPoint("TOPLEFT", frame.button1, "BOTTOMLEFT", 0, -1)
 				
-		frame.button4 = CreateFrame("Button", "UN_Button4", frame, "UIPanelButtonTemplate")
+		frame.button4 = CreateFrame("Button", "SL_Button4", frame, "UIPanelButtonTemplate")
 		frame.button4:SetSize(145,23)
 		frame.button4:SetPoint("TOPLEFT", frame.button2, "BOTTOMLEFT", 0, -1)
 			
-		frame.button5 = CreateFrame("Button", "UN_Button5", frame, "UIPanelButtonTemplate")
+		frame.button5 = CreateFrame("Button", "SL_Button5", frame, "UIPanelButtonTemplate")
 		frame.button5:SetSize(145,23)
 		frame.button5:SetPoint("TOPLEFT", frame.button3, "BOTTOMLEFT", 0, -1)
 				
-		frame.button6 = CreateFrame("Button", "UN_Button6", frame, "UIPanelButtonTemplate")
+		frame.button6 = CreateFrame("Button", "SL_Button6", frame, "UIPanelButtonTemplate")
 		frame.button6:SetSize(145,23)
 		frame.button6:SetPoint("TOPLEFT", frame.button4, "BOTTOMLEFT", 0, -1)
 		
-		frame.button7 = CreateFrame("Button", "UN_Button7", frame, "UIPanelButtonTemplate")
+		frame.button7 = CreateFrame("Button", "SL_Button7", frame, "UIPanelButtonTemplate")
 		frame.button7:SetSize(145,23)
 		frame.button7:SetPoint("TOPLEFT", frame.button5, "BOTTOMLEFT", 0, -1)
 		
@@ -1685,7 +1732,7 @@ function UnstableEPGP:GetLootFrame(itemID)
 		frame.scrollTable = scrollTable
 
 		-- Create Cancel Loot Button
-		local buttonCancel = CreateFrame("Button", "UN_Button6", frame, "UIPanelButtonTemplate")
+		local buttonCancel = CreateFrame("Button", "SL_Button6", frame, "UIPanelButtonTemplate")
 		buttonCancel:SetSize(100,23)
 		buttonCancel:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 3, 3)
 		buttonCancel:SetText("Cancel Loot")
@@ -1697,13 +1744,13 @@ function UnstableEPGP:GetLootFrame(itemID)
 		editBox:SetPoint("LEFT", buttonCancel, "RIGHT", 31, 0)
 		editBox:SetAutoFocus(false)
 		
-		editBox.label = editBox:CreateFontString("UN_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormal")
+		editBox.label = editBox:CreateFontString("SL_LootLabel"..self.frameNum, "OVERLAY", "GameFontNormal")
 		editBox.label:SetPoint("RIGHT", editBox, "LEFT", -5, -1)
 		editBox.label:SetText("GP:")
 		frame.editBox = editBox
 		
 		-- Create Discard Button
-		local buttonDiscard = CreateFrame("Button", "UN_Button6", frame, "UIPanelButtonTemplate")
+		local buttonDiscard = CreateFrame("Button", "SL_Button6", frame, "UIPanelButtonTemplate")
 		buttonDiscard:SetSize(85,23)
 		buttonDiscard:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -5, 3)
 		buttonDiscard:SetText("Discard")
@@ -1774,7 +1821,7 @@ function UnstableEPGP:GetLootFrame(itemID)
 	self:UpdateFrame(itemID, 1, frame)
 end
 
-function UnstableEPGP:UpdateFrame(itemID, tabNum, frame)
+function uEPGP:UpdateFrame(itemID, tabNum, frame)
 	if not frame and self.db.profile.tabbedFrame == "yes" then
 		frame = self.tabbedFrame
 		self.lootTable[itemID].frame = self.tabbedFrame
@@ -1813,11 +1860,11 @@ function UnstableEPGP:UpdateFrame(itemID, tabNum, frame)
 			else
 				if UnitIsUnit(self.lootTable[itemID].owner, "player") then
 					self:DiscardLoot(itemID, false)
-					self:SendMessage("UN_Close", nil, itemID)
+					self:SendMessage("SL_Close", nil, itemID)
 				else
 					-- When closing the window, only update response to "Pass" if no selection was made
 					if not self.lootTable[itemID].buttonState then
-						self:SendMessage("UN_Response", nil, itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color)
+						self:SendMessage("SL_Response", nil, itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color)
 					end
 					self:DiscardLoot(itemID, true)
 				end
@@ -1870,8 +1917,8 @@ function UnstableEPGP:UpdateFrame(itemID, tabNum, frame)
 			frame["button"..x]:SetText(self.lootTable[itemID]["button"..x])
 			frame["button"..x]:SetScript("OnClick", function()
 				self:UpdateSelectionButtons(itemID, x)
-				self:SendMessage("UN_Response", nil, itemID, "1"..x.." "..self.lootTable[itemID]["button"..x], self.lootTable[itemID]["button"..x.."c"])
-				self:UN_Response(itemID, format("1%d %s", x, self.lootTable[itemID]["button"..x]), self.lootTable[itemID]["button"..x.."c"], self:Disambiguate(UnitName("player")))
+				self:SendMessage("SL_Response", nil, itemID, "1"..x.." "..self.lootTable[itemID]["button"..x], self.lootTable[itemID]["button"..x.."c"])
+				self:SL_Response(itemID, format("1%d %s", x, self.lootTable[itemID]["button"..x]), self.lootTable[itemID]["button"..x.."c"], self:Disambiguate(UnitName("player")))
 				if not self.lootTable[itemID].allowReselect then
 					self:CancelTimer(self.lootTable[itemID].timer)
 				end
@@ -1893,8 +1940,8 @@ function UnstableEPGP:UpdateFrame(itemID, tabNum, frame)
 		-- Set Pass Button script
 		frame.buttonPass:SetScript("OnClick", function()
 			self:UpdateSelectionButtons(itemID, 8)
-			self:SendMessage("UN_Response", nil, itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color)
-			self:UN_Response(itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color, self:Disambiguate(UnitName("player")))
+			self:SendMessage("SL_Response", nil, itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color)
+			self:SL_Response(itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color, self:Disambiguate(UnitName("player")))
 			if not self.lootTable[itemID].allowReselect then
 				self:CancelTimer(self.lootTable[itemID].timer)
 			end
@@ -1917,11 +1964,11 @@ function UnstableEPGP:UpdateFrame(itemID, tabNum, frame)
 		})		
 	
 		-- Set Cancel and Discard Button script
-		frame.buttonCancel:SetScript("OnClick", function() self:DiscardLoot(itemID, false) self:SendMessage("UN_Close", nil, itemID) end)
+		frame.buttonCancel:SetScript("OnClick", function() self:DiscardLoot(itemID, false) self:SendMessage("SL_Close", nil, itemID) end)
 		frame.buttonDiscard:SetScript("OnClick", function()
 			-- When closing the window, only update response to "Pass" if no selection was made
 			if not self.lootTable[itemID].buttonState then
-				self:SendMessage("UN_Response", nil, itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color)
+				self:SendMessage("SL_Response", nil, itemID, self.RESPONSE["pass"].text, self.RESPONSE["pass"].color)
 			end
 			if self.db.profile.autoAdvance then
 				self:ScheduleTimer("SelectionAutoAdvance", 1)
@@ -1967,7 +2014,7 @@ function UnstableEPGP:UpdateFrame(itemID, tabNum, frame)
 	end
 end
 
-function UnstableEPGP:SetButtonScripts(owner, itemID, tabNum)
+function uEPGP:SetButtonScripts(owner, itemID, tabNum)
 	if self.lootTable[itemID].link then
 		owner:SetScript("OnEnter", function()
 			GameTooltip:SetOwner(owner, "ANCHOR_LEFT", -5, 3)
@@ -1990,8 +2037,8 @@ function UnstableEPGP:SetButtonScripts(owner, itemID, tabNum)
 	end
 end
 
-function UnstableEPGP:CreateTab(frame, tabNum)
-	local tab = CreateFrame("Button", "UN_Tab", frame, "ActionButtonTemplate, AutoCastShineTemplate")
+function uEPGP:CreateTab(frame, tabNum)
+	local tab = CreateFrame("Button", "SL_Tab", frame, "ActionButtonTemplate, AutoCastShineTemplate")
 	tab:SetSize(35, 35)
 	-- Check Button Glow
 	tab.glow = tab:CreateTexture(nil, "OVERLAY", nil)
